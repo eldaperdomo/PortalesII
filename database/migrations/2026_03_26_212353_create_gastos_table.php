@@ -13,7 +13,28 @@ return new class extends Migration
     {
         Schema::create('gastos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('propiedad_id')->constrained('propiedades')->onDelete('cascade');
+            $table->foreignId('unidad_id')->nullable()->constrained('unidades')->onDelete('set null');
+            $table->string('concepto');
+            $table->decimal('monto', 12, 2);
+            $table->date('fecha');
+            $table->enum('categoria', [
+                'mantenimiento',
+                'reparacion',
+                'impuesto',
+                'seguro',
+                'servicios',
+                'administracion',
+                'limpieza',
+                'otro'
+            ])->default('otro');
+            $table->enum('estado', ['pendiente', 'pagado', 'cancelado'])->default('pendiente');
+            $table->string('proveedor')->nullable();
+            $table->string('comprobante')->nullable()->comment('Número de factura o recibo');
+            $table->string('archivo_adjunto')->nullable();
+            $table->text('descripcion')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

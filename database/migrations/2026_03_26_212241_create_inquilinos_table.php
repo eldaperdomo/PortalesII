@@ -13,7 +13,22 @@ return new class extends Migration
     {
         Schema::create('inquilinos', function (Blueprint $table) {
             $table->id();
+            $table->string('nombre');
+            $table->string('apellido');
+            $table->string('dni')->unique()->comment('DPI, cédula, pasaporte');
+            $table->string('email')->unique()->nullable();
+            $table->string('telefono')->nullable();
+            $table->string('telefono_emergencia')->nullable();
+            $table->string('contacto_emergencia')->nullable();
+            $table->date('fecha_nacimiento')->nullable();
+            $table->enum('estado_civil', ['soltero', 'casado', 'divorciado', 'viudo', 'otro'])->nullable();
+            $table->string('ocupacion')->nullable();
+            $table->string('empresa')->nullable();
+            $table->decimal('ingreso_mensual', 12, 2)->nullable();
+            $table->text('observaciones')->nullable();
+            $table->boolean('activo')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
