@@ -32,7 +32,7 @@
     {{-- Sidebar --}}
     <div class="sidebar p-3" style="width:240px; flex-shrink:0;">
         <div class="text-white fw-bold fs-5 mb-4 px-2">
-            <i class="bi bi-building me-2"></i>Alquileres
+            <i class="bi bi-building me-2"></i>Sistema de Alquileres
         </div>
         <span class="section-title">Módulos</span>
         <a href="{{ route('propiedades.index') }}"
