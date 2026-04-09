@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\contratos;
-use App\Models\unidades;
-use App\Models\inquilinos;
+use App\Models\contrato;
+use App\Models\unidad;
+use App\Models\inquilino;
 use Illuminate\Http\Request;
 
 class ContratosController extends Controller

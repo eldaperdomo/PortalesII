@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class propiedades extends Model
+class propiedad extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'propiedades';
+    protected $table = 'propiedad';
 
     protected $fillable = [
         'user_id',

@@ -19,20 +19,21 @@ Route::get('/', function () {
 */
 
 Route::middleware(['auth'])->group(function () {
+    Route::resource('propiedad', PropiedadesController::class);
 
     // ── Propiedades ──────────────────────────────────────────────────────────
-    Route::resource('propiedades', PropiedadesController::class);
+    Route::resource('propiedad', PropiedadesController::class);
 
     // ── Unidades ─────────────────────────────────────────────────────────────
-    Route::resource('unidades', UnidadesController::class);
+    Route::resource('unidad', UnidadesController::class);
 
     // ── Inquilinos ───────────────────────────────────────────────────────────
-    Route::resource('inquilinos', InquilinosController::class);
+    Route::resource('inquilino', InquilinosController::class);
 
     // ── Contratos ────────────────────────────────────────────────────────────
-    Route::resource('contratos', ContratosController::class);
+    Route::resource('contrato', ContratosController::class);
 
     // ── Gastos ───────────────────────────────────────────────────────────────
-    Route::resource('gastos', GastosController::class);
+    Route::resource('gasto', GastosController::class);
 
 });

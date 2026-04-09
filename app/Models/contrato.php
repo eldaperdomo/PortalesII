@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class contratos extends Model
+class contrato extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'contratos';
+    protected $table = 'contrato';
 
     protected $fillable = [
         'unidad_id',

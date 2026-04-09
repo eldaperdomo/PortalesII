@@ -35,24 +35,24 @@
             <i class="bi bi-building me-2"></i>Sistema de Alquileres
         </div>
         <span class="section-title">Módulos</span>
-        <a href="{{ route('propiedades.index') }}"
-           class="nav-link {{ request()->routeIs('propiedades*') ? 'active' : '' }}">
+        <a href="{{ route('propiedad.index') }}"
+           class="nav-link {{ request()->routeIs('propiedad*') ? 'active' : '' }}">
             <i class="bi bi-house-door me-2"></i>Propiedades
         </a>
-        <a href="{{ route('unidades.index') }}"
-           class="nav-link {{ request()->routeIs('unidades*') ? 'active' : '' }}">
+        <a href="{{ route('unidad.index') }}"
+           class="nav-link {{ request()->routeIs('unidad*') ? 'active' : '' }}">
             <i class="bi bi-door-open me-2"></i>Unidades
         </a>
-        <a href="{{ route('inquilinos.index') }}"
-           class="nav-link {{ request()->routeIs('inquilinos*') ? 'active' : '' }}">
+        <a href="{{ route('inquilino.index') }}"
+           class="nav-link {{ request()->routeIs('inquilino*') ? 'active' : '' }}">
             <i class="bi bi-people me-2"></i>Inquilinos
         </a>
-        <a href="{{ route('contratos.index') }}"
-           class="nav-link {{ request()->routeIs('contratos*') ? 'active' : '' }}">
+        <a href="{{ route('contrato.index') }}"
+           class="nav-link {{ request()->routeIs('contrato*') ? 'active' : '' }}">
             <i class="bi bi-file-text me-2"></i>Contratos
         </a>
-        <a href="{{ route('gastos.index') }}"
-           class="nav-link {{ request()->routeIs('gastos*') ? 'active' : '' }}">
+        <a href="{{ route('gasto.index') }}"
+           class="nav-link {{ request()->routeIs('gasto*') ? 'active' : '' }}">
             <i class="bi bi-cash-stack me-2"></i>Gastos
         </a>
     </div>

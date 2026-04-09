@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\gastos;
-use App\Models\propiedades;
-use App\Models\unidades;
+use App\Models\gasto;
+use App\Models\propiedad;
+use App\Models\unidad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 

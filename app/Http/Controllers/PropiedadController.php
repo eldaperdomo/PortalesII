@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\propiedades;
+use App\Models\propiedad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class PropiedadesController extends Controller
+class PropiedadController extends Controller
 {
     public function index()
     {
-        $propiedades = Propiedad::withCount('unidades')
-            ->with('unidades')
+        $propiedad = Propiedad::withCount('unidad')
+            ->with('unidad')
             ->latest()
             ->paginate(10);
 
-        return view('propiedades.index', compact('propiedades'));
+        return view('propiedad.index', compact('propiedad'));
     }
 
     public function create()
     {
-        return view('propiedades.create');
+        return view('propiedad.create');
     }
 
     public function store(Request $request)
@@ -46,7 +46,7 @@ class PropiedadesController extends Controller
 
         Propiedad::create($validated);
 
-        return redirect()->route('propiedades.index')
+        return redirect()->route('propiedad.index')
             ->with('success', 'Propiedad registrada correctamente.');
     }
 
@@ -57,12 +57,12 @@ class PropiedadesController extends Controller
             'gastos' => fn($q) => $q->latest()->limit(10),
         ]);
 
-        return view('propiedades.show', compact('propiedad'));
+        return view('propiedad.show', compact('propiedad'));
     }
 
     public function edit(Propiedad $propiedad)
     {
-        return view('propiedades.edit', compact('propiedad'));
+        return view('propiedad.edit', compact('propiedad'));
     }
 
     public function update(Request $request, Propiedad $propiedad)
@@ -89,19 +89,19 @@ class PropiedadesController extends Controller
 
         $propiedad->update($validated);
 
-        return redirect()->route('propiedades.show', $propiedad)
+        return redirect()->route('propiedad.show', $propiedad)
             ->with('success', 'Propiedad actualizada correctamente.');
     }
 
     public function destroy(Propiedad $propiedad)
     {
-        if ($propiedad->unidades()->whereIn('estado', ['ocupada'])->exists()) {
+        if ($propiedad->unidad()->whereIn('estado', ['ocupada'])->exists()) {
             return back()->with('error', 'No se puede eliminar una propiedad con unidades ocupadas.');
         }
 
         $propiedad->delete();
 
-        return redirect()->route('propiedades.index')
+        return redirect()->route('propiedad.index')
             ->with('success', 'Propiedad eliminada correctamente.');
     }
 }

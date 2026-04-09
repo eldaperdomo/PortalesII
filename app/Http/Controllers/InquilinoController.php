@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\inquilinos;
+use App\Models\inquilino;
 use Illuminate\Http\Request;
 
 class InquilinosController extends Controller

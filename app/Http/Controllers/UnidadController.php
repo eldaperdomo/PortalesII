@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\unidades;
-use App\Models\propiedades;
+use App\Models\unidad;
+use App\Models\propiedad;
 use Illuminate\Http\Request;
 
 class UnidadesController extends Controller
