@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class propiedad extends Model
+class Propiedad extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'propiedad';
+    protected $table = 'propiedades';
 
     protected $fillable = [
         'user_id',
@@ -40,12 +40,17 @@ class propiedad extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function unidades(): HasMany
+    public function unidades()
+{
+    return $this->hasMany(Unidad::class, 'propiedad_id');
+}
+
+    public function unidad(): HasMany
     {
         return $this->hasMany(Unidad::class);
     }
 
-    public function gastos(): HasMany
+    public function gasto(): HasMany
     {
         return $this->hasMany(Gasto::class);
     }
@@ -61,17 +66,17 @@ class propiedad extends Model
 
     public function getTotalUnidadesAttribute(): int
     {
-        return $this->unidades()->count();
+        return $this->unidad()->count();
     }
 
     public function getUnidadesDisponiblesAttribute(): int
     {
-        return $this->unidades()->where('estado', 'disponible')->count();
+        return $this->unidad()->where('estado', 'disponible')->count();
     }
 
     public function getUnidadesOcupadasAttribute(): int
     {
-        return $this->unidades()->where('estado', 'ocupada')->count();
+        return $this->unidad()->where('estado', 'ocupada')->count();
     }
 
     public function getDireccionCompletaAttribute(): string

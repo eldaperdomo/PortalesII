@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PropiedadesController;
-use App\Http\Controllers\UnidadesController;
-use App\Http\Controllers\InquilinosController;
-use App\Http\Controllers\ContratosController;
-use App\Http\Controllers\GastosController;
+use App\Http\Controllers\PropiedadController;
+use App\Http\Controllers\UnidadController;
+use App\Http\Controllers\InquilinoController;
+use App\Http\Controllers\ContratoController;
+use App\Http\Controllers\GastoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,22 +18,17 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->group(function () {
-    Route::resource('propiedad', PropiedadesController::class);
-
     // ── Propiedades ──────────────────────────────────────────────────────────
-    Route::resource('propiedad', PropiedadesController::class);
+    Route::resource('propiedad', PropiedadController::class);
 
     // ── Unidades ─────────────────────────────────────────────────────────────
-    Route::resource('unidad', UnidadesController::class);
+    Route::resource('unidad', UnidadController::class);
 
     // ── Inquilinos ───────────────────────────────────────────────────────────
-    Route::resource('inquilino', InquilinosController::class);
+    Route::resource('inquilino', InquilinoController::class);
 
     // ── Contratos ────────────────────────────────────────────────────────────
-    Route::resource('contrato', ContratosController::class);
+    Route::resource('contrato', ContratoController::class);
 
     // ── Gastos ───────────────────────────────────────────────────────────────
-    Route::resource('gasto', GastosController::class);
-
-});
+    Route::resource('gasto', GastoController::class);

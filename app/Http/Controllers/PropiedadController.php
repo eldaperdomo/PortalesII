@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\propiedad;
+use App\Models\Propiedad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -10,8 +10,8 @@ class PropiedadController extends Controller
 {
     public function index()
     {
-        $propiedad = Propiedad::withCount('unidad')
-            ->with('unidad')
+        $propiedad = Propiedad::withCount('unidades')
+            ->with('unidades')
             ->latest()
             ->paginate(10);
 
@@ -53,8 +53,8 @@ class PropiedadController extends Controller
     public function show(Propiedad $propiedad)
     {
         $propiedad->load([
-            'unidades',
-            'gastos' => fn($q) => $q->latest()->limit(10),
+            'unidad',
+            'gasto' => fn($q) => $q->latest()->limit(10),
         ]);
 
         return view('propiedad.show', compact('propiedad'));
@@ -84,7 +84,7 @@ class PropiedadController extends Controller
             if ($propiedad->imagen) {
                 Storage::disk('public')->delete($propiedad->imagen);
             }
-            $validated['imagen'] = $request->file('imagen')->store('propiedades', 'public');
+            $validated['imagen'] = $request->file('imagen')->store('propiedad', 'public');
         }
 
         $propiedad->update($validated);
