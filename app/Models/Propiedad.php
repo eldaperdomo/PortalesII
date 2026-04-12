@@ -40,12 +40,12 @@ class Propiedad extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function unidades()
+    public function Unidades()
 {
     return $this->hasMany(Unidad::class, 'propiedad_id');
 }
 
-    public function unidad(): HasMany
+    public function Unidad(): HasMany
     {
         return $this->hasMany(Unidad::class);
     }

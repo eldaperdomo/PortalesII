@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\unidad;
-use App\Models\propiedad;
+use App\Models\Unidad;
+use App\Models\Propiedad;
 use Illuminate\Http\Request;
 
-class UnidadesController extends Controller
+class UnidadController extends Controller
 {
     public function index()
     {
-        $unidades = Unidad::with('propiedad')
+        $unidades = Unidad::with('Propiedad')
             ->latest()
             ->paginate(10);
 
-        return view('unidades.index', compact('unidades'));
+        return view('unidad.index', compact('unidades'));
     }
 
     public function create()
     {
         $propiedades = Propiedad::activas()->get();
-        return view('unidades.create', compact('propiedades'));
+        return view('unidad.create', compact('propiedades'));
     }
 
     public function store(Request $request)
@@ -42,20 +42,20 @@ class UnidadesController extends Controller
 
         Unidad::create($validated);
 
-        return redirect()->route('unidades.index')
+        return redirect()->route('unidad.index')
             ->with('success', 'Unidad registrada correctamente.');
     }
 
     public function show(Unidad $unidad)
     {
-        $unidad->load(['propiedad', 'contratos.inquilino', 'gastos']);
-        return view('unidades.show', compact('unidad'));
+        $unidad->load(['propiedad', 'contrato.inquilino', 'gasto']);
+        return view('unidad.show', compact('unidad'));
     }
 
     public function edit(Unidad $unidad)
     {
         $propiedades = Propiedad::activas()->get();
-        return view('unidades.edit', compact('unidad', 'propiedades'));
+        return view('unidad.edit', compact('unidad', 'propiedad'));
     }
 
     public function update(Request $request, Unidad $unidad)
@@ -77,7 +77,7 @@ class UnidadesController extends Controller
 
         $unidad->update($validated);
 
-        return redirect()->route('unidades.show', $unidad)
+        return redirect()->route('unidad.show', $unidad)
             ->with('success', 'Unidad actualizada correctamente.');
     }
 
@@ -89,7 +89,7 @@ class UnidadesController extends Controller
 
         $unidad->delete();
 
-        return redirect()->route('unidades.index')
+        return redirect()->route('unidad.index')
             ->with('success', 'Unidad eliminada correctamente.');
     }
 }

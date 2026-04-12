@@ -10,12 +10,12 @@ class PropiedadController extends Controller
 {
     public function index()
     {
-        $propiedad = Propiedad::withCount('unidades')
+        $propiedades = Propiedad::withCount('unidades')
             ->with('unidades')
             ->latest()
             ->paginate(10);
 
-        return view('propiedad.index', compact('propiedad'));
+        return view('propiedad.index', compact('propiedades'));
     }
 
     public function create()

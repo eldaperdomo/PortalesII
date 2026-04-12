@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\inquilino;
+use App\Models\Inquilino;
 use Illuminate\Http\Request;
 
-class InquilinosController extends Controller
+class InquilinoController extends Controller
 {
     public function index()
     {
-        $inquilinos = Inquilino::withCount('contratos')
+        $Inquilinos = Inquilino::withCount('Contratos')
             ->latest()
             ->paginate(10);
 
-        return view('inquilinos.index', compact('inquilinos'));
+        return view('inquilino.index', compact('Inquilinos'));
     }
 
     public function create()
     {
-        return view('inquilinos.create');
+        return view('inquilino.create');
     }
 
     public function store(Request $request)
@@ -41,19 +41,19 @@ class InquilinosController extends Controller
 
         Inquilino::create($validated);
 
-        return redirect()->route('inquilinos.index')
+        return redirect()->route('inquilino.index')
             ->with('success', 'Inquilino registrado correctamente.');
     }
 
     public function show(Inquilino $inquilino)
     {
-        $inquilino->load(['contratos.unidad.propiedad']);
-        return view('inquilinos.show', compact('inquilino'));
+        $inquilino->load(['contrato.unidad.propiedad']);
+        return view('inquilino.show', compact('inquilino'));
     }
 
     public function edit(Inquilino $inquilino)
     {
-        return view('inquilinos.edit', compact('inquilino'));
+        return view('inquilino.edit', compact('inquilino'));
     }
 
     public function update(Request $request, Inquilino $inquilino)
@@ -76,7 +76,7 @@ class InquilinosController extends Controller
 
         $inquilino->update($validated);
 
-        return redirect()->route('inquilinos.show', $inquilino)
+        return redirect()->route('inquilino.show', $inquilino)
             ->with('success', 'Inquilino actualizado correctamente.');
     }
 
@@ -88,7 +88,7 @@ class InquilinosController extends Controller
 
         $inquilino->delete();
 
-        return redirect()->route('inquilinos.index')
+        return redirect()->route('inquilino.index')
             ->with('success', 'Inquilino eliminado correctamente.');
     }
 }

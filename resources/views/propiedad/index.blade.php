@@ -23,7 +23,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($propiedad as $propiedad)
+                @forelse($propiedades as $propiedad)
                     <tr>
                         <td>
                             <strong>{{ $propiedad->nombre }}</strong><br>
@@ -67,5 +67,5 @@
     </div>
 </div>
 
-<div class="mt-3">{{ $propiedad->links() }}</div>
+<div class="mt-3">{{ $propiedades->links() }}</div>
 @endsection

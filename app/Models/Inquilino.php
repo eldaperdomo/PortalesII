@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class inquilino extends Model
+class Inquilino extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'inquilino';
+    protected $table = 'inquilinos';
 
     protected $fillable = [
         'nombre',

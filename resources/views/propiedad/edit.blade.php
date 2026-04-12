@@ -1,17 +1,17 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Editar Propiedad')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar Propiedad</h4>
-    <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-outline-secondary">
+    <a href="{{ route('propiedad.show', $propiedad) }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
 </div>
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('propiedades.update', $propiedad) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('propiedad.update', $propiedad) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -98,7 +98,7 @@
                 <button type="submit" class="btn btn-warning">
                     <i class="bi bi-save me-1"></i>Actualizar Propiedad
                 </button>
-                <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-outline-secondary">Cancelar</a>
+                <a href="{{ route('propiedad.show', $propiedad) }}" class="btn btn-outline-secondary">Cancelar</a>
             </div>
         </form>
     </div>
