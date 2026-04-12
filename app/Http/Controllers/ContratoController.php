@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\contrato;
-use App\Models\unidad;
-use App\Models\inquilino;
+use App\Models\Contrato;
+use App\Models\Unidad;
+use App\Models\Inquilino;
 use Illuminate\Http\Request;
 
-class ContratosController extends Controller
+class ContratoController extends Controller
 {
     public function index()
     {
-        $contratos = Contrato::with(['unidad.propiedad', 'inquilino'])
+        $Contrato = Contrato::with(['Unidad.Propiedad', 'inquilino'])
             ->latest()
             ->paginate(10);
 
-        return view('contratos.index', compact('contratos'));
+        return view('contrato.index', compact('Contrato'));
     }
 
     public function create()
     {
         $unidades   = Unidad::disponibles()->with('propiedad')->get();
         $inquilinos = Inquilino::activos()->get();
-        return view('contratos.create', compact('unidades', 'inquilinos'));
+        return view('contrato.create', compact('unidades', 'inquilinos'));
     }
 
     public function store(Request $request)
@@ -58,21 +58,21 @@ class ContratosController extends Controller
 
         Contrato::create($validated);
 
-        return redirect()->route('contratos.index')
+        return redirect()->route('contrato.index')
             ->with('success', 'Contrato creado correctamente.');
     }
 
     public function show(Contrato $contrato)
     {
         $contrato->load(['unidad.propiedad', 'inquilino']);
-        return view('contratos.show', compact('contrato'));
+        return view('contrato.show', compact('contrato'));
     }
 
     public function edit(Contrato $contrato)
     {
         $unidades   = Unidad::with('propiedad')->get();
         $inquilinos = Inquilino::activos()->get();
-        return view('contratos.edit', compact('contrato', 'unidades', 'inquilinos'));
+        return view('contrato.edit', compact('contrato', 'unidades', 'inquilinos'));
     }
 
     public function update(Request $request, Contrato $contrato)
@@ -95,7 +95,7 @@ class ContratosController extends Controller
 
         $contrato->update($validated);
 
-        return redirect()->route('contratos.show', $contrato)
+        return redirect()->route('contrato.show', $contrato)
             ->with('success', 'Contrato actualizado correctamente.');
     }
 
@@ -107,7 +107,7 @@ class ContratosController extends Controller
 
         $contrato->delete();
 
-        return redirect()->route('contratos.index')
+        return redirect()->route('contrato.index')
             ->with('success', 'Contrato eliminado correctamente.');
     }
 }

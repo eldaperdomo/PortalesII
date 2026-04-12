@@ -2,31 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\gasto;
-use App\Models\propiedad;
-use App\Models\unidad;
+use App\Models\Gasto;
+use App\Models\Propiedad;
+use App\Models\Unidad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class GastosController extends Controller
+class GastoController extends Controller
 {
     public function index()
     {
-        $gastos = Gasto::with(['propiedad', 'unidad'])
+        $Gastos = Gasto::with(['Propiedad', 'Unidad'])
             ->latest()
             ->paginate(10);
 
         $totalPendiente = Gasto::pendientes()->sum('monto');
         $totalMes       = Gasto::delMes()->sum('monto');
 
-        return view('gastos.index', compact('gastos', 'totalPendiente', 'totalMes'));
+        return view('gasto.index', compact('Gastos', 'totalPendiente', 'totalMes'));
     }
 
     public function create()
     {
-        $propiedades = Propiedad::activas()->get();
-        $unidades    = Unidad::with('propiedad')->get();
-        return view('gastos.create', compact('propiedades', 'unidades'));
+        $propiedad = Propiedad::activas()->get();
+        $unidad    = Unidad::with('propiedad')->get();
+        return view('gasto.create', compact('propiedad', 'unidad'));
     }
 
     public function store(Request $request)
@@ -47,7 +47,7 @@ class GastosController extends Controller
 
         if ($request->hasFile('archivo_adjunto')) {
             $validated['archivo_adjunto'] = $request->file('archivo_adjunto')
-                ->store('gastos', 'public');
+                ->store('gasto', 'public');
         }
 
         // Validar que la unidad pertenece a la propiedad seleccionada
@@ -61,21 +61,21 @@ class GastosController extends Controller
 
         Gasto::create($validated);
 
-        return redirect()->route('gastos.index')
+        return redirect()->route('gasto.index')
             ->with('success', 'Gasto registrado correctamente.');
     }
 
     public function show(Gasto $gasto)
     {
         $gasto->load(['propiedad', 'unidad']);
-        return view('gastos.show', compact('gasto'));
+        return view('gasto.show', compact('gasto'));
     }
 
     public function edit(Gasto $gasto)
     {
         $propiedades = Propiedad::activas()->get();
         $unidades    = Unidad::with('propiedad')->get();
-        return view('gastos.edit', compact('gasto', 'propiedades', 'unidades'));
+        return view('gasto.edit', compact('gasto', 'propiedades', 'unidades'));
     }
 
     public function update(Request $request, Gasto $gasto)
@@ -104,7 +104,7 @@ class GastosController extends Controller
 
         $gasto->update($validated);
 
-        return redirect()->route('gastos.show', $gasto)
+        return redirect()->route('gasto.show', $gasto)
             ->with('success', 'Gasto actualizado correctamente.');
     }
 
@@ -116,7 +116,7 @@ class GastosController extends Controller
 
         $gasto->delete();
 
-        return redirect()->route('gastos.index')
+        return redirect()->route('gasto.index')
             ->with('success', 'Gasto eliminado correctamente.');
     }
 }

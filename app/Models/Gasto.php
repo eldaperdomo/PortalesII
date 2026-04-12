@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class gasto extends Model
+class Gasto extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'gasto';
+    protected $table = 'gastos';
 
     protected $fillable = [
         'propiedad_id',
