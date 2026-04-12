@@ -6,35 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('inquilinos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('apellido');
-            $table->string('dni')->unique()->comment('DPI, cédula, pasaporte');
-            $table->string('email')->unique()->nullable();
-            $table->string('telefono')->nullable();
-            $table->string('telefono_emergencia')->nullable();
-            $table->string('contacto_emergencia')->nullable();
-            $table->date('fecha_nacimiento')->nullable();
-            $table->enum('estado_civil', ['soltero', 'casado', 'divorciado', 'viudo', 'otro'])->nullable();
-            $table->string('ocupacion')->nullable();
-            $table->string('empresa')->nullable();
-            $table->decimal('ingreso_mensual', 12, 2)->nullable();
-            $table->text('observaciones')->nullable();
-            $table->boolean('activo')->default(true);
-            $table->timestamps();
-            $table->softDeletes();
+            $table->string('nombre', 150);
+            $table->string('telefono', 20)->nullable();
+            $table->string('correo', 100)->nullable();
+            $table->string('foto_url', 255)->nullable();
+            $table->tinyInteger('activo')->default(1);
+            $table->string('codigo_registro', 20)->nullable();
+            $table->tinyInteger('codigo_registro_usado')->default(0);
+            $table->dateTime('codigo_registro_expira_en')->nullable();
+            $table->integer('creado_por_usuario_id')->nullable();
+            $table->integer('actualizado_por_usuario_id')->nullable();
+            $table->dateTime('creado_en')->nullable();
+            $table->dateTime('actualizado_en')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('inquilinos');

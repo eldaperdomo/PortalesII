@@ -1,9 +1,9 @@
-@extends('welcome')
-@section('title', $inquilino->nombre_completo)
+@extends('layouts.app')
+@section('title', $inquilino->nombre)
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0"><i class="bi bi-person me-2"></i>{{ $inquilino->nombre_completo }}</h4>
+    <h4 class="mb-0"><i class="bi bi-person me-2"></i>{{ $inquilino->nombre }}</h4>
     <div class="d-flex gap-2">
         <a href="{{ route('inquilinos.edit', $inquilino) }}" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Editar
@@ -17,31 +17,25 @@
 <div class="row g-4">
     <div class="col-md-4">
         <div class="card">
-            <div class="card-body">
-                <h6 class="text-muted mb-3">Información Personal</h6>
-                <table class="table table-sm table-borderless">
-                    <tr><th>DNI</th><td>{{ $inquilino->dni }}</td></tr>
-                    <tr><th>Nacimiento</th><td>{{ $inquilino->fecha_nacimiento?->format('d/m/Y') ?? 'N/D' }}</td></tr>
-                    <tr><th>Estado Civil</th><td>{{ ucfirst($inquilino->estado_civil ?? 'N/D') }}</td></tr>
-                    <tr><th>Email</th><td>{{ $inquilino->email ?? '—' }}</td></tr>
-                    <tr><th>Teléfono</th><td>{{ $inquilino->telefono ?? '—' }}</td></tr>
-                    <tr><th>Emergencia</th><td>{{ $inquilino->contacto_emergencia ?? '—' }} {{ $inquilino->telefono_emergencia ? '/ '.$inquilino->telefono_emergencia : '' }}</td></tr>
-                    <tr><th>Ocupación</th><td>{{ $inquilino->ocupacion ?? '—' }}</td></tr>
-                    <tr><th>Empresa</th><td>{{ $inquilino->empresa ?? '—' }}</td></tr>
-                    <tr><th>Ingreso</th><td>{{ $inquilino->ingreso_mensual ? 'L '.number_format($inquilino->ingreso_mensual,2) : '—' }}</td></tr>
-                    <tr><th>Estado</th>
-                        <td>
-                            @if($inquilino->activo)
-                                <span class="badge bg-success">Activo</span>
-                            @else
-                                <span class="badge bg-secondary">Inactivo</span>
-                            @endif
-                        </td>
-                    </tr>
-                </table>
-                @if($inquilino->observaciones)
-                    <p class="text-muted small border-top pt-2">{{ $inquilino->observaciones }}</p>
+            <div class="card-body text-center">
+                @if($inquilino->foto_url)
+                    <img src="{{ $inquilino->foto_url }}" alt="{{ $inquilino->nombre }}"
+                         class="rounded-circle mb-3" style="width:90px;height:90px;object-fit:cover;">
+                @else
+                    <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width:90px;height:90px;">
+                        <i class="bi bi-person-fill text-white fs-2"></i>
+                    </div>
                 @endif
+                <h5 class="mb-1">{{ $inquilino->nombre }}</h5>
+                <p class="text-muted small mb-0">{{ $inquilino->correo ?? 'Sin correo' }}</p>
+                <p class="text-muted small">{{ $inquilino->telefono ?? 'Sin teléfono' }}</p>
+                <span class="badge {{ $inquilino->activo ? 'bg-success' : 'bg-secondary' }}">
+                    {{ $inquilino->activo ? 'Activo' : 'Inactivo' }}
+                </span>
+            </div>
+            <div class="card-footer text-muted small text-center">
+                Registrado: {{ $inquilino->creado_en?->format('d/m/Y') ?? '—' }}
             </div>
         </div>
     </div>
@@ -49,7 +43,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <strong><i class="bi bi-file-text me-2"></i>Historial de Contratos</strong>
+                <strong><i class="bi bi-file-text me-2"></i>Contratos</strong>
                 <a href="{{ route('contratos.create') }}?inquilino_id={{ $inquilino->id }}"
                    class="btn btn-sm btn-primary">
                     <i class="bi bi-plus me-1"></i>Nuevo Contrato
@@ -59,11 +53,11 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>Código</th>
                             <th>Unidad</th>
                             <th>Propiedad</th>
-                            <th>Monto</th>
-                            <th>Período</th>
+                            <th>Renta</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
                             <th>Estado</th>
                             <th></th>
                         </tr>
@@ -71,32 +65,27 @@
                     <tbody>
                         @forelse($inquilino->contratos as $contrato)
                             <tr>
-                                <td>{{ $contrato->codigo }}</td>
-                                <td>{{ $contrato->unidad->nombre }}</td>
+                                <td>{{ $contrato->unidad->identificador }}</td>
                                 <td>{{ $contrato->unidad->propiedad->nombre }}</td>
-                                <td>L {{ number_format($contrato->monto_mensual, 2) }}</td>
+                                <td>L {{ number_format($contrato->monto_renta, 2) }}</td>
+                                <td>{{ $contrato->fecha_inicio->format('d/m/Y') }}</td>
+                                <td>{{ $contrato->fecha_fin->format('d/m/Y') }}</td>
                                 <td>
-                                    <small>
-                                        {{ $contrato->fecha_inicio->format('d/m/Y') }} —
-                                        {{ $contrato->fecha_fin->format('d/m/Y') }}
-                                    </small>
-                                </td>
-                                <td>
-                                    <span class="badge badge-{{ $contrato->estado }}">
+                                    <span class="badge
+                                        @if($contrato->estado == 'activo') bg-success
+                                        @elseif($contrato->estado == 'terminado') bg-secondary
+                                        @else bg-danger @endif">
                                         {{ ucfirst($contrato->estado) }}
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('contratos.show', $contrato) }}"
-                                       class="btn btn-sm btn-outline-info">
+                                    <a href="{{ route('contratos.show', $contrato) }}" class="btn btn-sm btn-outline-info">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>
                             </tr>
                         @empty
-                            <tr>
-                                <td colspan="7" class="text-center text-muted py-3">Sin contratos registrados.</td>
-                            </tr>
+                            <tr><td colspan="7" class="text-center text-muted py-3">Sin contratos registrados.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

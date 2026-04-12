@@ -3,70 +3,55 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Gasto extends Model
 {
-    use HasFactory, SoftDeletes;
-
     protected $table = 'gastos';
 
+    public $timestamps = false;
+
     protected $fillable = [
-        'propiedad_id',
         'unidad_id',
-        'concepto',
+        'fecha_gasto',
         'monto',
-        'fecha',
-        'categoria',
-        'estado',
-        'proveedor',
-        'comprobante',
-        'archivo_adjunto',
+        'tipo',
         'descripcion',
+        'observaciones',
+        'comprobante_url',
+        'activo',
+        'creado_por_usuario_id',
+        'actualizado_por_usuario_id',
+        'creado_en',
+        'actualizado_en',
     ];
 
     protected $casts = [
-        'fecha' => 'date',
-        'monto' => 'decimal:2',
+        'fecha_gasto'    => 'date',
+        'monto'          => 'decimal:2',
+        'activo'         => 'boolean',
+        'creado_en'      => 'datetime',
+        'actualizado_en' => 'datetime',
     ];
 
     // ─── Relaciones ────────────────────────────────────────────────────────────
 
-    public function propiedad(): BelongsTo
-    {
-        return $this->belongsTo(Propiedad::class);
-    }
-
     public function unidad(): BelongsTo
     {
-        return $this->belongsTo(Unidad::class);
+        return $this->belongsTo(Unidad::class, 'unidad_id');
     }
 
     // ─── Scopes ────────────────────────────────────────────────────────────────
 
-    public function scopePendientes($query)
+    public function scopeActivos($query)
     {
-        return $query->where('estado', 'pendiente');
-    }
-
-    public function scopePagados($query)
-    {
-        return $query->where('estado', 'pagado');
+        return $query->where('activo', 1);
     }
 
     public function scopeDelMes($query, $mes = null, $anio = null)
     {
         $mes  = $mes  ?? now()->month;
         $anio = $anio ?? now()->year;
-        return $query->whereMonth('fecha', $mes)->whereYear('fecha', $anio);
-    }
-
-    // ─── Accessors ─────────────────────────────────────────────────────────────
-
-    public function getEsPendienteAttribute(): bool
-    {
-        return $this->estado === 'pendiente';
+        return $query->whereMonth('fecha_gasto', $mes)->whereYear('fecha_gasto', $anio);
     }
 }

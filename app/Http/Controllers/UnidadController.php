@@ -10,10 +10,7 @@ class UnidadController extends Controller
 {
     public function index()
     {
-        $unidades = Unidad::with('Propiedad')
-            ->latest()
-            ->paginate(10);
-
+        $unidades = Unidad::with('propiedad')->latest('creado_en')->paginate(10);
         return view('unidad.index', compact('unidades'));
     }
 
@@ -26,19 +23,18 @@ class UnidadController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'propiedad_id'   => 'required|exists:propiedades,id',
-            'nombre'         => 'required|string|max:255',
-            'numero'         => 'nullable|string|max:50',
-            'tipo'           => 'required|in:apartamento,casa,habitacion,local,oficina,bodega,otro',
-            'area'           => 'nullable|numeric|min:0',
-            'habitaciones'   => 'required|integer|min:0',
-            'banos'          => 'required|integer|min:0',
-            'tiene_parqueo'  => 'boolean',
-            'precio_renta'   => 'required|numeric|min:0',
-            'estado'         => 'required|in:disponible,ocupada,en_mantenimiento,inactiva',
-            'descripcion'    => 'nullable|string',
-            'piso'           => 'nullable|integer',
+            'propiedad_id'  => 'required|exists:propiedades,id',
+            'identificador' => 'required|string|max:50',
+            'estado'        => 'required|in:disponible,ocupada,mantenimiento',
+            'monto_renta'   => 'required|numeric|min:0',
+            'activo'        => 'nullable|boolean',
         ]);
+
+        $validated['activo']                     = $request->has('activo') ? 1 : 0;
+        $validated['creado_por_usuario_id']      = auth()->id();
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+        $validated['creado_en']                  = now();
+        $validated['actualizado_en']             = now();
 
         Unidad::create($validated);
 
@@ -48,32 +44,29 @@ class UnidadController extends Controller
 
     public function show(Unidad $unidad)
     {
-        $unidad->load(['propiedad', 'contrato.inquilino', 'gasto']);
+        $unidad->load(['propiedad', 'contratos.inquilino', 'gastos']);
         return view('unidad.show', compact('unidad'));
     }
 
     public function edit(Unidad $unidad)
     {
         $propiedades = Propiedad::activas()->get();
-        return view('unidad.edit', compact('unidad', 'propiedad'));
+        return view('unidad.edit', compact('unidad', 'propiedades'));
     }
 
     public function update(Request $request, Unidad $unidad)
     {
         $validated = $request->validate([
-            'propiedad_id'   => 'required|exists:propiedades,id',
-            'nombre'         => 'required|string|max:255',
-            'numero'         => 'nullable|string|max:50',
-            'tipo'           => 'required|in:apartamento,casa,habitacion,local,oficina,bodega,otro',
-            'area'           => 'nullable|numeric|min:0',
-            'habitaciones'   => 'required|integer|min:0',
-            'banos'          => 'required|integer|min:0',
-            'tiene_parqueo'  => 'boolean',
-            'precio_renta'   => 'required|numeric|min:0',
-            'estado'         => 'required|in:disponible,ocupada,en_mantenimiento,inactiva',
-            'descripcion'    => 'nullable|string',
-            'piso'           => 'nullable|integer',
+            'propiedad_id'  => 'required|exists:propiedades,id',
+            'identificador' => 'required|string|max:50',
+            'estado'        => 'required|in:disponible,ocupada,mantenimiento',
+            'monto_renta'   => 'required|numeric|min:0',
+            'activo'        => 'nullable|boolean',
         ]);
+
+        $validated['activo']                     = $request->has('activo') ? 1 : 0;
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+        $validated['actualizado_en']             = now();
 
         $unidad->update($validated);
 
@@ -86,9 +79,7 @@ class UnidadController extends Controller
         if ($unidad->estado === 'ocupada') {
             return back()->with('error', 'No se puede eliminar una unidad ocupada.');
         }
-
         $unidad->delete();
-
         return redirect()->route('unidad.index')
             ->with('success', 'Unidad eliminada correctamente.');
     }

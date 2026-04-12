@@ -1,10 +1,10 @@
-@extends('welcome')
+@extends('layouts.app')
 @section('title', 'Contratos')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-file-text me-2"></i>Contratos</h4>
-    <a href="{{ route('contrato.create') }}" class="btn btn-primary">
+    <a href="{{ route('contratos.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nuevo Contrato
     </a>
 </div>
@@ -14,47 +14,47 @@
         <table class="table table-hover mb-0 align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Código</th>
                     <th>Inquilino</th>
                     <th>Unidad / Propiedad</th>
-                    <th>Monto Mensual</th>
-                    <th>Vigencia</th>
+                    <th>Renta</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
                     <th>Estado</th>
                     <th class="text-end">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($Contrato as $contrato)
+                @forelse($contratos as $contrato)
                     <tr>
-                        <td><strong>{{ $contrato->codigo }}</strong></td>
-                        <td>{{ $contrato->inquilino->nombre_completo }}</td>
+                        <td><strong>{{ $contrato->inquilino->nombre }}</strong></td>
                         <td>
-                            {{ $contrato->unidad->nombre }}<br>
+                            {{ $contrato->unidad->identificador }}<br>
                             <small class="text-muted">{{ $contrato->unidad->propiedad->nombre }}</small>
                         </td>
-                        <td>L {{ number_format($contrato->monto_mensual, 2) }}</td>
+                        <td>L {{ number_format($contrato->monto_renta, 2) }}</td>
+                        <td>{{ $contrato->fecha_inicio->format('d/m/Y') }}</td>
                         <td>
-                            <small>
-                                {{ $contrato->fecha_inicio->format('d/m/Y') }}<br>
-                                {{ $contrato->fecha_fin->format('d/m/Y') }}
-                            </small>
-                        </td>
-                        <td>
-                            <span class="badge badge-{{ $contrato->estado }}">
-                                {{ ucfirst($contrato->estado) }}
-                            </span>
-                            @if($contrato->estado === 'activo' && $contrato->dias_para_vencer <= 30 && $contrato->dias_para_vencer > 0)
-                                <br><small class="text-warning">Vence en {{ $contrato->dias_para_vencer }} días</small>
+                            {{ $contrato->fecha_fin->format('d/m/Y') }}
+                            @if($contrato->estado == 'activo' && $contrato->dias_para_vencer <= 30 && $contrato->dias_para_vencer > 0)
+                                <br><small class="text-warning"><i class="bi bi-exclamation-triangle"></i> {{ $contrato->dias_para_vencer }} días</small>
                             @endif
                         </td>
+                        <td>
+                            <span class="badge
+                                @if($contrato->estado == 'activo') bg-success
+                                @elseif($contrato->estado == 'terminado') bg-secondary
+                                @else bg-danger @endif">
+                                {{ ucfirst($contrato->estado) }}
+                            </span>
+                        </td>
                         <td class="text-end">
-                            <a href="{{ route('contrato.show', $contrato) }}" class="btn btn-sm btn-outline-info">
+                            <a href="{{ route('contratos.show', $contrato) }}" class="btn btn-sm btn-outline-info">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{{ route('contrato.edit', $contrato) }}" class="btn btn-sm btn-outline-warning">
+                            <a href="{{ route('contratos.edit', $contrato) }}" class="btn btn-sm btn-outline-warning">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form action="{{ route('contrato.destroy', $contrato) }}" method="POST" class="d-inline"
+                            <form action="{{ route('contratos.destroy', $contrato) }}" method="POST" class="d-inline"
                                   onsubmit="return confirm('¿Eliminar este contrato?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
@@ -70,5 +70,5 @@
         </table>
     </div>
 </div>
-<div class="mt-3">{{ $Contrato->links() }}</div>
+<div class="mt-3">{{ $contratos->links() }}</div>
 @endsection

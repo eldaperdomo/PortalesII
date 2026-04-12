@@ -11,11 +11,8 @@ class ContratoController extends Controller
 {
     public function index()
     {
-        $Contrato = Contrato::with(['Unidad.Propiedad', 'inquilino'])
-            ->latest()
-            ->paginate(10);
-
-        return view('contrato.index', compact('Contrato'));
+        $contratos = Contrato::with(['unidad.propiedad', 'inquilino'])->latest('creado_en')->paginate(10);
+        return view('contrato.index', compact('contratos'));
     }
 
     public function create()
@@ -28,33 +25,26 @@ class ContratoController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'unidad_id'              => 'required|exists:unidades,id',
-            'inquilino_id'           => 'required|exists:inquilinos,id',
-            'fecha_inicio'           => 'required|date',
-            'fecha_fin'              => 'required|date|after:fecha_inicio',
-            'monto_mensual'          => 'required|numeric|min:0',
-            'deposito'               => 'nullable|numeric|min:0',
-            'dia_pago'               => 'required|integer|min:1|max:31',
-            'estado'                 => 'required|in:activo,vencido,cancelado,pendiente',
-            'periodicidad'           => 'required|in:mensual,bimestral,trimestral,semestral,anual',
-            'incremento_anual'       => 'nullable|numeric|min:0|max:100',
-            'clausulas_adicionales'  => 'nullable|string',
-            'observaciones'          => 'nullable|string',
-            'renovacion_automatica'  => 'boolean',
+            'unidad_id'    => 'required|exists:unidades,id',
+            'inquilino_id' => 'required|exists:inquilinos,id',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin'    => 'required|date|after:fecha_inicio',
+            'monto_renta'  => 'required|numeric|min:0',
+            'dia_pago'     => 'required|integer|min:1|max:31',
+            'estado'       => 'required|in:activo,terminado,cancelado',
+            'activo'       => 'nullable|boolean',
         ]);
 
         // Verificar que la unidad no tenga contrato activo
-        $tieneContratoActivo = Contrato::where('unidad_id', $validated['unidad_id'])
-            ->where('estado', 'activo')
-            ->exists();
-
-        if ($tieneContratoActivo) {
-            return back()
-                ->withInput()
-                ->with('error', 'La unidad ya tiene un contrato activo.');
+        if (Contrato::where('unidad_id', $validated['unidad_id'])->where('estado', 'activo')->exists()) {
+            return back()->withInput()->with('error', 'La unidad ya tiene un contrato activo.');
         }
 
-        $validated['codigo'] = Contrato::generarCodigo();
+        $validated['activo']                     = $request->has('activo') ? 1 : 0;
+        $validated['creado_por_usuario_id']      = auth()->id();
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+        $validated['creado_en']                  = now();
+        $validated['actualizado_en']             = now();
 
         Contrato::create($validated);
 
@@ -78,20 +68,19 @@ class ContratoController extends Controller
     public function update(Request $request, Contrato $contrato)
     {
         $validated = $request->validate([
-            'unidad_id'              => 'required|exists:unidades,id',
-            'inquilino_id'           => 'required|exists:inquilinos,id',
-            'fecha_inicio'           => 'required|date',
-            'fecha_fin'              => 'required|date|after:fecha_inicio',
-            'monto_mensual'          => 'required|numeric|min:0',
-            'deposito'               => 'nullable|numeric|min:0',
-            'dia_pago'               => 'required|integer|min:1|max:31',
-            'estado'                 => 'required|in:activo,vencido,cancelado,pendiente',
-            'periodicidad'           => 'required|in:mensual,bimestral,trimestral,semestral,anual',
-            'incremento_anual'       => 'nullable|numeric|min:0|max:100',
-            'clausulas_adicionales'  => 'nullable|string',
-            'observaciones'          => 'nullable|string',
-            'renovacion_automatica'  => 'boolean',
+            'unidad_id'    => 'required|exists:unidades,id',
+            'inquilino_id' => 'required|exists:inquilinos,id',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin'    => 'required|date|after:fecha_inicio',
+            'monto_renta'  => 'required|numeric|min:0',
+            'dia_pago'     => 'required|integer|min:1|max:31',
+            'estado'       => 'required|in:activo,terminado,cancelado',
+            'activo'       => 'nullable|boolean',
         ]);
+
+        $validated['activo']                     = $request->has('activo') ? 1 : 0;
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+        $validated['actualizado_en']             = now();
 
         $contrato->update($validated);
 
@@ -102,11 +91,9 @@ class ContratoController extends Controller
     public function destroy(Contrato $contrato)
     {
         if ($contrato->estado === 'activo') {
-            return back()->with('error', 'No se puede eliminar un contrato activo. Cancélelo primero.');
+            return back()->with('error', 'No se puede eliminar un contrato activo.');
         }
-
         $contrato->delete();
-
         return redirect()->route('contrato.index')
             ->with('success', 'Contrato eliminado correctamente.');
     }

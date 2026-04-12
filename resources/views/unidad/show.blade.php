@@ -1,125 +1,123 @@
-@extends('welcome')
-@section('title', 'Editar Unidad')
+@extends('layouts.app')
+@section('title', $unidad->identificador)
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar Unidad — {{ $unidad->nombre }}</h4>
-    <a href="{{ route('unidad.show', $unidad) }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-1"></i>Volver
-    </a>
+    <h4 class="mb-0"><i class="bi bi-door-open me-2"></i>{{ $unidad->identificador }}</h4>
+    <div class="d-flex gap-2">
+        <a href="{{ route('unidades.edit', $unidad) }}" class="btn btn-warning">
+            <i class="bi bi-pencil me-1"></i>Editar
+        </a>
+        <a href="{{ route('unidades.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+    </div>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        <form action="{{ route('unidad.update', $unidad) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="row g-3">
-
-                <div class="col-md-6">
-                    <label class="form-label">Propiedad *</label>
-                    <select name="propiedad_id" class="form-select @error('propiedad_id') is-invalid @enderror" required>
-                        @foreach($propiedades as $propiedad)
-                            <option value="{{ $propiedad->id }}"
-                                {{ old('propiedad_id', $unidad->propiedad_id) == $propiedad->id ? 'selected' : '' }}>
-                                {{ $propiedad->nombre }} — {{ $propiedad->ciudad }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('propiedad_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Nombre / Identificador *</label>
-                    <input type="text" name="nombre" class="form-control @error('nombre') is-invalid @enderror"
-                           value="{{ old('nombre', $unidad->nombre) }}" required>
-                    @error('nombre') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Número</label>
-                    <input type="text" name="numero" class="form-control"
-                           value="{{ old('numero', $unidad->numero) }}">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Tipo *</label>
-                    <select name="tipo" class="form-select" required>
-                        @foreach(['apartamento','casa','habitacion','local','oficina','bodega','otro'] as $tipo)
-                            <option value="{{ $tipo }}"
-                                {{ old('tipo', $unidad->tipo) == $tipo ? 'selected' : '' }}>
-                                {{ ucfirst($tipo) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Piso</label>
-                    <input type="number" name="piso" class="form-control"
-                           value="{{ old('piso', $unidad->piso) }}">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Área (m²)</label>
-                    <input type="number" name="area" class="form-control" step="0.01" min="0"
-                           value="{{ old('area', $unidad->area) }}">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Habitaciones *</label>
-                    <input type="number" name="habitaciones" class="form-control" min="0"
-                           value="{{ old('habitaciones', $unidad->habitaciones) }}" required>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Baños *</label>
-                    <input type="number" name="banos" class="form-control" min="0"
-                           value="{{ old('banos', $unidad->banos) }}" required>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Precio de Renta *</label>
-                    <div class="input-group">
-                        <span class="input-group-text">L</span>
-                        <input type="number" name="precio_renta" class="form-control" step="0.01" min="0"
-                               value="{{ old('precio_renta', $unidad->precio_renta) }}" required>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Estado *</label>
-                    <select name="estado" class="form-select" required>
-                        @foreach(['disponible','ocupada','en_mantenimiento','inactiva'] as $estado)
-                            <option value="{{ $estado }}"
-                                {{ old('estado', $unidad->estado) == $estado ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('_', ' ', $estado)) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-md-3 d-flex align-items-end">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="tiene_parqueo" value="1"
-                               id="parqueo" {{ old('tiene_parqueo', $unidad->tiene_parqueo) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="parqueo">Incluye parqueo</label>
-                    </div>
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label">Descripción</label>
-                    <textarea name="descripcion" class="form-control" rows="3">{{ old('descripcion', $unidad->descripcion) }}</textarea>
-                </div>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-3">Detalle</h6>
+                <table class="table table-sm table-borderless">
+                    <tr><th>Propiedad</th>
+                        <td><a href="{{ route('propiedades.show', $unidad->propiedad) }}">{{ $unidad->propiedad->nombre }}</a></td>
+                    </tr>
+                    <tr><th>Estado</th>
+                        <td>
+                            <span class="badge
+                                @if($unidad->estado == 'disponible') bg-success
+                                @elseif($unidad->estado == 'ocupada') bg-danger
+                                @else bg-warning text-dark @endif">
+                                {{ ucfirst($unidad->estado) }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr><th>Renta</th><td><strong>L {{ number_format($unidad->monto_renta, 2) }}</strong></td></tr>
+                    <tr><th>Activo</th>
+                        <td>{{ $unidad->activo ? 'Sí' : 'No' }}</td>
+                    </tr>
+                    <tr><th>Registrado</th><td>{{ $unidad->creado_en?->format('d/m/Y') ?? '—' }}</td></tr>
+                </table>
             </div>
+        </div>
+    </div>
 
-            <div class="mt-4 d-flex gap-2">
-                <button type="submit" class="btn btn-warning">
-                    <i class="bi bi-save me-1"></i>Actualizar Unidad
-                </button>
-                <a href="{{ route('unidad.show', $unidad) }}" class="btn btn-outline-secondary">Cancelar</a>
+    <div class="col-md-8">
+        {{-- Contratos --}}
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong><i class="bi bi-file-text me-2"></i>Contratos</strong>
+                @if($unidad->estado == 'disponible')
+                    <a href="{{ route('contratos.create') }}?unidad_id={{ $unidad->id }}"
+                       class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus me-1"></i>Nuevo
+                    </a>
+                @endif
             </div>
-        </form>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Inquilino</th><th>Inicio</th><th>Fin</th><th>Renta</th><th>Estado</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @forelse($unidad->contratos as $contrato)
+                            <tr>
+                                <td>{{ $contrato->inquilino->nombre }}</td>
+                                <td>{{ $contrato->fecha_inicio->format('d/m/Y') }}</td>
+                                <td>{{ $contrato->fecha_fin->format('d/m/Y') }}</td>
+                                <td>L {{ number_format($contrato->monto_renta, 2) }}</td>
+                                <td>
+                                    <span class="badge
+                                        @if($contrato->estado == 'activo') bg-success
+                                        @elseif($contrato->estado == 'terminado') bg-secondary
+                                        @else bg-danger @endif">
+                                        {{ ucfirst($contrato->estado) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ route('contratos.show', $contrato) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="6" class="text-center text-muted py-3">Sin contratos.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Gastos --}}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong><i class="bi bi-cash-stack me-2"></i>Gastos</strong>
+                <a href="{{ route('gastos.create') }}?unidad_id={{ $unidad->id }}"
+                   class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus me-1"></i>Registrar
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Descripción</th><th>Tipo</th><th>Fecha</th><th>Monto</th></tr>
+                    </thead>
+                    <tbody>
+                        @forelse($unidad->gastos as $gasto)
+                            <tr>
+                                <td>{{ $gasto->descripcion ?? '—' }}</td>
+                                <td>{{ ucfirst($gasto->tipo) }}</td>
+                                <td>{{ $gasto->fecha_gasto->format('d/m/Y') }}</td>
+                                <td>L {{ number_format($gasto->monto, 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="text-center text-muted py-3">Sin gastos.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

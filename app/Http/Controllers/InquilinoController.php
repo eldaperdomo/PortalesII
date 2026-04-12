@@ -9,11 +9,8 @@ class InquilinoController extends Controller
 {
     public function index()
     {
-        $Inquilinos = Inquilino::withCount('Contratos')
-            ->latest()
-            ->paginate(10);
-
-        return view('inquilino.index', compact('Inquilinos'));
+        $inquilinos = Inquilino::withCount('contratos')->latest('creado_en')->paginate(10);
+        return view('inquilino.index', compact('inquilinos'));
     }
 
     public function create()
@@ -24,20 +21,18 @@ class InquilinoController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre'               => 'required|string|max:100',
-            'apellido'             => 'required|string|max:100',
-            'dni'                  => 'required|string|max:30|unique:inquilinos,dni',
-            'email'                => 'nullable|email|unique:inquilinos,email',
-            'telefono'             => 'nullable|string|max:20',
-            'telefono_emergencia'  => 'nullable|string|max:20',
-            'contacto_emergencia'  => 'nullable|string|max:150',
-            'fecha_nacimiento'     => 'nullable|date|before:today',
-            'estado_civil'         => 'nullable|in:soltero,casado,divorciado,viudo,otro',
-            'ocupacion'            => 'nullable|string|max:100',
-            'empresa'              => 'nullable|string|max:150',
-            'ingreso_mensual'      => 'nullable|numeric|min:0',
-            'observaciones'        => 'nullable|string',
+            'nombre'   => 'required|string|max:150',
+            'telefono' => 'nullable|string|max:20',
+            'correo'   => 'nullable|email|max:100|unique:inquilinos,correo',
+            'foto_url' => 'nullable|string|max:255',
+            'activo'   => 'nullable|boolean',
         ]);
+
+        $validated['activo']                     = $request->has('activo') ? 1 : 0;
+        $validated['creado_por_usuario_id']      = auth()->id();
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+        $validated['creado_en']                  = now();
+        $validated['actualizado_en']             = now();
 
         Inquilino::create($validated);
 
@@ -47,7 +42,7 @@ class InquilinoController extends Controller
 
     public function show(Inquilino $inquilino)
     {
-        $inquilino->load(['contrato.unidad.propiedad']);
+        $inquilino->load(['contratos.unidad.propiedad']);
         return view('inquilino.show', compact('inquilino'));
     }
 
@@ -59,20 +54,16 @@ class InquilinoController extends Controller
     public function update(Request $request, Inquilino $inquilino)
     {
         $validated = $request->validate([
-            'nombre'               => 'required|string|max:100',
-            'apellido'             => 'required|string|max:100',
-            'dni'                  => 'required|string|max:30|unique:inquilinos,dni,' . $inquilino->id,
-            'email'                => 'nullable|email|unique:inquilinos,email,' . $inquilino->id,
-            'telefono'             => 'nullable|string|max:20',
-            'telefono_emergencia'  => 'nullable|string|max:20',
-            'contacto_emergencia'  => 'nullable|string|max:150',
-            'fecha_nacimiento'     => 'nullable|date|before:today',
-            'estado_civil'         => 'nullable|in:soltero,casado,divorciado,viudo,otro',
-            'ocupacion'            => 'nullable|string|max:100',
-            'empresa'              => 'nullable|string|max:150',
-            'ingreso_mensual'      => 'nullable|numeric|min:0',
-            'observaciones'        => 'nullable|string',
+            'nombre'   => 'required|string|max:150',
+            'telefono' => 'nullable|string|max:20',
+            'correo'   => 'nullable|email|max:100|unique:inquilinos,correo,' . $inquilino->id,
+            'foto_url' => 'nullable|string|max:255',
+            'activo'   => 'nullable|boolean',
         ]);
+
+        $validated['activo']                     = $request->has('activo') ? 1 : 0;
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+        $validated['actualizado_en']             = now();
 
         $inquilino->update($validated);
 
@@ -85,9 +76,7 @@ class InquilinoController extends Controller
         if ($inquilino->contratos()->where('estado', 'activo')->exists()) {
             return back()->with('error', 'No se puede eliminar un inquilino con contratos activos.');
         }
-
         $inquilino->delete();
-
         return redirect()->route('inquilino.index')
             ->with('success', 'Inquilino eliminado correctamente.');
     }

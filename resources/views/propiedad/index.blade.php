@@ -1,10 +1,10 @@
-@extends('welcome')
-@section('title', 'Propiedad')
+@extends('layouts.app')
+@section('title', 'Propiedades')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-house-door me-2"></i>Propiedades</h4>
-    <a href="{{ route('propiedad.create') }}" class="btn btn-primary">
+    <a href="{{ route('propiedades.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nueva Propiedad
     </a>
 </div>
@@ -16,41 +16,38 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Tipo</th>
-                    <th>Ciudad</th>
+                    <th>Dirección</th>
                     <th>Unidades</th>
-                    <th>Estado</th>
+                    <th>Activo</th>
                     <th class="text-end">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($propiedades as $propiedad)
                     <tr>
+                        <td><strong>{{ $propiedad->nombre }}</strong></td>
+                        <td>{{ ucfirst($propiedad->tipo) }}</td>
+                        <td>{{ $propiedad->direccion ?? '—' }}</td>
                         <td>
-                            <strong>{{ $propiedad->nombre }}</strong><br>
-                            <small class="text-muted">{{ $propiedad->direccion }}</small>
-                        </td>
-                        <td><span class="text-capitalize">{{ $propiedad->tipo }}</span></td>
-                        <td>{{ $propiedad->ciudad }}</td>
-                        <td>
-                            <span class="badge bg-secondary">{{ $propiedad->unidad_count }} total</span>
-                            <span class="badge badge-disponible">{{ $propiedad->unidad_disponibles }} libres</span>
-                            <span class="badge badge-ocupada">{{ $propiedad->unidad_ocupadas }} ocupadas</span>
+                            <span class="badge bg-secondary">{{ $propiedad->unidades_count }} total</span>
+                            <span class="badge bg-success">{{ $propiedad->unidades_disponibles }} libres</span>
+                            <span class="badge bg-danger">{{ $propiedad->unidades_ocupadas }} ocupadas</span>
                         </td>
                         <td>
-                            @if($propiedad->activa)
-                                <span class="badge bg-success">Activa</span>
+                            @if($propiedad->activo)
+                                <span class="badge bg-success">Sí</span>
                             @else
-                                <span class="badge bg-secondary">Inactiva</span>
+                                <span class="badge bg-secondary">No</span>
                             @endif
                         </td>
                         <td class="text-end">
-                            <a href="{{ route('propiedad.show', $propiedad) }}" class="btn btn-sm btn-outline-info">
+                            <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-sm btn-outline-info">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{{ route('propiedad.edit', $propiedad) }}" class="btn btn-sm btn-outline-warning">
+                            <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-sm btn-outline-warning">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form action="{{ route('propiedad.destroy', $propiedad) }}" method="POST" class="d-inline"
+                            <form action="{{ route('propiedades.destroy', $propiedad) }}" method="POST" class="d-inline"
                                   onsubmit="return confirm('¿Eliminar esta propiedad?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
@@ -66,6 +63,5 @@
         </table>
     </div>
 </div>
-
 <div class="mt-3">{{ $propiedades->links() }}</div>
 @endsection

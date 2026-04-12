@@ -3,84 +3,56 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Propiedad extends Model
 {
-    use HasFactory, SoftDeletes;
-
     protected $table = 'propiedades';
 
+    // Desactivamos timestamps automáticos de Laravel porque usamos creado_en / actualizado_en
+    public $timestamps = false;
+
     protected $fillable = [
-        'user_id',
         'nombre',
         'direccion',
-        'ciudad',
-        'departamento',
-        'codigo_postal',
         'tipo',
         'descripcion',
-        'area_total',
-        'imagen',
-        'activa',
+        'activo',
+        'creado_por_usuario_id',
+        'actualizado_por_usuario_id',
+        'creado_en',
+        'actualizado_en',
     ];
 
     protected $casts = [
-        'activa'     => 'boolean',
-        'area_total' => 'decimal:2',
+        'activo'        => 'boolean',
+        'creado_en'     => 'datetime',
+        'actualizado_en'=> 'datetime',
     ];
 
     // ─── Relaciones ────────────────────────────────────────────────────────────
 
-    public function user(): BelongsTo
+    public function unidades(): HasMany
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function Unidades()
-{
-    return $this->hasMany(Unidad::class, 'propiedad_id');
-}
-
-    public function Unidad(): HasMany
-    {
-        return $this->hasMany(Unidad::class);
-    }
-
-    public function gasto(): HasMany
-    {
-        return $this->hasMany(Gasto::class);
+        return $this->hasMany(Unidad::class, 'propiedad_id');
     }
 
     // ─── Scopes ────────────────────────────────────────────────────────────────
 
     public function scopeActivas($query)
     {
-        return $query->where('activa', true);
+        return $query->where('activo', 1);
     }
 
     // ─── Accessors ─────────────────────────────────────────────────────────────
 
-    public function getTotalUnidadesAttribute(): int
-    {
-        return $this->unidad()->count();
-    }
-
     public function getUnidadesDisponiblesAttribute(): int
     {
-        return $this->unidad()->where('estado', 'disponible')->count();
+        return $this->unidades()->where('estado', 'disponible')->count();
     }
 
     public function getUnidadesOcupadasAttribute(): int
     {
-        return $this->unidad()->where('estado', 'ocupada')->count();
-    }
-
-    public function getDireccionCompletaAttribute(): string
-    {
-        return "{$this->direccion}, {$this->ciudad}" . ($this->departamento ? ", {$this->departamento}" : '');
+        return $this->unidades()->where('estado', 'ocupada')->count();
     }
 }

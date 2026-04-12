@@ -3,53 +3,49 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Unidad extends Model
 {
-    use HasFactory, SoftDeletes;
-
     protected $table = 'unidades';
+
+    public $timestamps = false;
 
     protected $fillable = [
         'propiedad_id',
-        'nombre',
-        'numero',
-        'tipo',
-        'area',
-        'habitaciones',
-        'banos',
-        'tiene_parqueo',
-        'precio_renta',
+        'identificador',
         'estado',
-        'descripcion',
-        'piso',
+        'monto_renta',
+        'activo',
+        'creado_por_usuario_id',
+        'actualizado_por_usuario_id',
+        'creado_en',
+        'actualizado_en',
     ];
 
     protected $casts = [
-        'tiene_parqueo' => 'boolean',
-        'precio_renta'  => 'decimal:2',
-        'area'          => 'decimal:2',
+        'activo'         => 'boolean',
+        'monto_renta'    => 'decimal:2',
+        'creado_en'      => 'datetime',
+        'actualizado_en' => 'datetime',
     ];
 
     // ─── Relaciones ────────────────────────────────────────────────────────────
 
     public function propiedad(): BelongsTo
     {
-        return $this->belongsTo(Propiedad::class);
+        return $this->belongsTo(Propiedad::class, 'propiedad_id');
     }
 
     public function contratos(): HasMany
     {
-        return $this->hasMany(Contrato::class);
+        return $this->hasMany(Contrato::class, 'unidad_id');
     }
 
     public function gastos(): HasMany
     {
-        return $this->hasMany(Gasto::class);
+        return $this->hasMany(Gasto::class, 'unidad_id');
     }
 
     // ─── Scopes ────────────────────────────────────────────────────────────────
@@ -59,20 +55,15 @@ class Unidad extends Model
         return $query->where('estado', 'disponible');
     }
 
-    public function scopeOcupadas($query)
+    public function scopeActivas($query)
     {
-        return $query->where('estado', 'ocupada');
+        return $query->where('activo', 1);
     }
 
     // ─── Accessors ─────────────────────────────────────────────────────────────
 
     public function getContratoActivoAttribute(): ?Contrato
     {
-        return $this->contratos()->where('estado', 'activo')->latest()->first();
-    }
-
-    public function getEstaOcupadaAttribute(): bool
-    {
-        return $this->estado === 'ocupada';
+        return $this->contratos()->where('estado', 'activo')->latest('creado_en')->first();
     }
 }

@@ -4,17 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Propiedad;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class PropiedadController extends Controller
 {
     public function index()
     {
-        $propiedades = Propiedad::withCount('unidades')
-            ->with('unidades')
-            ->latest()
-            ->paginate(10);
-
+        $propiedades = Propiedad::withCount('unidades')->latest('creado_en')->paginate(10);
         return view('propiedad.index', compact('propiedades'));
     }
 
@@ -26,23 +21,18 @@ class PropiedadController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre'        => 'required|string|max:255',
-            'direccion'     => 'required|string|max:255',
-            'ciudad'        => 'required|string|max:100',
-            'departamento'  => 'nullable|string|max:100',
-            'codigo_postal' => 'nullable|string|max:20',
-            'tipo'          => 'required|in:casa,apartamento,local_comercial,edificio,otro',
-            'descripcion'   => 'nullable|string',
-            'area_total'    => 'nullable|numeric|min:0',
-            'imagen'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'activa'        => 'boolean',
+            'nombre'      => 'required|string|max:150',
+            'direccion'   => 'nullable|string|max:255',
+            'tipo'        => 'required|in:casa,edificio',
+            'descripcion' => 'nullable|string',
+            'activo'      => 'nullable|boolean',
         ]);
 
-        if ($request->hasFile('imagen')) {
-            $validated['imagen'] = $request->file('imagen')->store('propiedades', 'public');
-        }
-
-        $validated['user_id'] = auth()->id();
+        $validated['activo']               = $request->has('activo') ? 1 : 0;
+        $validated['creado_por_usuario_id']     = auth()->id();
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+        $validated['creado_en']            = now();
+        $validated['actualizado_en']       = now();
 
         Propiedad::create($validated);
 
@@ -52,11 +42,7 @@ class PropiedadController extends Controller
 
     public function show(Propiedad $propiedad)
     {
-        $propiedad->load([
-            'unidad',
-            'gasto' => fn($q) => $q->latest()->limit(10),
-        ]);
-
+        $propiedad->load(['unidades']);
         return view('propiedad.show', compact('propiedad'));
     }
 
@@ -68,24 +54,16 @@ class PropiedadController extends Controller
     public function update(Request $request, Propiedad $propiedad)
     {
         $validated = $request->validate([
-            'nombre'        => 'required|string|max:255',
-            'direccion'     => 'required|string|max:255',
-            'ciudad'        => 'required|string|max:100',
-            'departamento'  => 'nullable|string|max:100',
-            'codigo_postal' => 'nullable|string|max:20',
-            'tipo'          => 'required|in:casa,apartamento,local_comercial,edificio,otro',
-            'descripcion'   => 'nullable|string',
-            'area_total'    => 'nullable|numeric|min:0',
-            'imagen'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'activa'        => 'boolean',
+            'nombre'      => 'required|string|max:150',
+            'direccion'   => 'nullable|string|max:255',
+            'tipo'        => 'required|in:casa,edificio',
+            'descripcion' => 'nullable|string',
+            'activo'      => 'nullable|boolean',
         ]);
 
-        if ($request->hasFile('imagen')) {
-            if ($propiedad->imagen) {
-                Storage::disk('public')->delete($propiedad->imagen);
-            }
-            $validated['imagen'] = $request->file('imagen')->store('propiedad', 'public');
-        }
+        $validated['activo']                     = $request->has('activo') ? 1 : 0;
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+        $validated['actualizado_en']             = now();
 
         $propiedad->update($validated);
 
@@ -95,12 +73,10 @@ class PropiedadController extends Controller
 
     public function destroy(Propiedad $propiedad)
     {
-        if ($propiedad->unidad()->whereIn('estado', ['ocupada'])->exists()) {
+        if ($propiedad->unidades()->where('estado', 'ocupada')->exists()) {
             return back()->with('error', 'No se puede eliminar una propiedad con unidades ocupadas.');
         }
-
         $propiedad->delete();
-
         return redirect()->route('propiedad.index')
             ->with('success', 'Propiedad eliminada correctamente.');
     }

@@ -1,10 +1,10 @@
-@extends('welcome')
-@section('title', 'Unidad')
+@extends('layouts.app')
+@section('title', 'Unidades')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-door-open me-2"></i>Unidades</h4>
-    <a href="{{ route('unidad.create') }}" class="btn btn-primary">
+    <a href="{{ route('unidades.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nueva Unidad
     </a>
 </div>
@@ -14,37 +14,43 @@
         <table class="table table-hover mb-0 align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Unidad</th>
+                    <th>Identificador</th>
                     <th>Propiedad</th>
-                    <th>Tipo</th>
                     <th>Renta Mensual</th>
                     <th>Estado</th>
+                    <th>Activo</th>
                     <th class="text-end">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($unidades as $unidad)
                     <tr>
-                        <td>
-                            <strong>{{ $unidad->nombre }}</strong>
-                            @if($unidad->piso) <br><small class="text-muted">Piso {{ $unidad->piso }}</small> @endif
-                        </td>
+                        <td><strong>{{ $unidad->identificador }}</strong></td>
                         <td>{{ $unidad->propiedad->nombre }}</td>
-                        <td>{{ ucfirst($unidad->tipo) }}</td>
-                        <td>L {{ number_format($unidad->precio_renta, 2) }}</td>
+                        <td>L {{ number_format($unidad->monto_renta, 2) }}</td>
                         <td>
-                            <span class="badge badge-{{ $unidad->estado }}">
-                                {{ ucfirst(str_replace('_', ' ', $unidad->estado)) }}
+                            <span class="badge
+                                @if($unidad->estado == 'disponible') bg-success
+                                @elseif($unidad->estado == 'ocupada') bg-danger
+                                @else bg-warning text-dark @endif">
+                                {{ ucfirst($unidad->estado) }}
                             </span>
                         </td>
+                        <td>
+                            @if($unidad->activo)
+                                <span class="badge bg-success">Sí</span>
+                            @else
+                                <span class="badge bg-secondary">No</span>
+                            @endif
+                        </td>
                         <td class="text-end">
-                            <a href="{{ route('unidad.show', $unidad) }}" class="btn btn-sm btn-outline-info">
+                            <a href="{{ route('unidades.show', $unidad) }}" class="btn btn-sm btn-outline-info">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{{ route('unidad.edit', $unidad) }}" class="btn btn-sm btn-outline-warning">
+                            <a href="{{ route('unidades.edit', $unidad) }}" class="btn btn-sm btn-outline-warning">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form action="{{ route('unidad.destroy', $unidad) }}" method="POST" class="d-inline"
+                            <form action="{{ route('unidades.destroy', $unidad) }}" method="POST" class="d-inline"
                                   onsubmit="return confirm('¿Eliminar esta unidad?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
