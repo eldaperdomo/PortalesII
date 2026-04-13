@@ -32,3 +32,7 @@ Route::get('/', function () {
 
     // ── Gastos ───────────────────────────────────────────────────────────────
     Route::resource('gasto', GastoController::class);
+
+    Route::get('/', function () {
+    return view('welcome'); // o la vista que usas
+})->name('welcome');

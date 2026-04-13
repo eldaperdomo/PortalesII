@@ -31,9 +31,10 @@
 <div class="d-flex">
     {{-- Sidebar --}}
     <div class="sidebar p-3" style="width:240px; flex-shrink:0;">
-        <div class="text-white fw-bold fs-5 mb-4 px-2">
-            <i class="bi bi-building me-2"></i>Sistema de Alquileres
-        </div>
+        <a href="{{ route('welcome') }}" 
+   class="text-white fw-bold fs-5 mb-4 px-2 d-block text-decoration-none">
+    <i class="bi bi-building me-2"></i>Sistema de Alquileres
+</a>
         <span class="section-title">Módulos</span>
         <a href="{{ route('propiedad.index') }}"
            class="nav-link {{ request()->routeIs('propiedad*') ? 'active' : '' }}">
@@ -73,7 +74,67 @@
             </div>
         @endif
 
-        @yield('content')
+    @if(View::hasSection('content'))
+    @yield('content')
+@else
+    {{-- Dashboard por defecto --}}
+    <h2 class="mb-4">Panel General</h2>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6 class="text-muted">Propiedades</h6>
+                <h3>{{ \App\Models\Propiedad::count() }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6 class="text-muted">Unidades</h6>
+                <h3>{{ \App\Models\Unidad::count() }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6 class="text-muted">Inquilinos</h6>
+                <h3>{{ \App\Models\Inquilino::count() }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6 class="text-muted">Gastos</h6>
+                <h3>{{ \App\Models\Gasto::count() }}</h3>
+            </div>
+        </div>
+    </div>
+
+    {{-- Últimos gastos --}}
+    <div class="card mt-4 p-3">
+        <h5 class="mb-3">Últimos Gastos</h5>
+
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Categoría</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(\App\Models\Gasto::latest()->take(5)->get() as $gasto)
+                    <tr>
+                        <td>{{ $gasto->fecha }}</td>
+                        <td>{{ ucfirst($gasto->categoria) }}</td>
+                        <td>L {{ number_format($gasto->monto, 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+@endif
+
     </div>
 </div>
 
