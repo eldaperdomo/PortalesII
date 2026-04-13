@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Unidades')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-door-open me-2"></i>Unidades</h4>
-    <a href="{{ route('unidades.create') }}" class="btn btn-primary">
+    <a href="{{ route('unidad.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nueva Unidad
     </a>
 </div>
@@ -44,13 +44,13 @@
                             @endif
                         </td>
                         <td class="text-end">
-                            <a href="{{ route('unidades.show', $unidad) }}" class="btn btn-sm btn-outline-info">
+                            <a href="{{ route('unidad.show', $unidad) }}" class="btn btn-sm btn-outline-info">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{{ route('unidades.edit', $unidad) }}" class="btn btn-sm btn-outline-warning">
+                            <a href="{{ route('unidad.edit', $unidad) }}" class="btn btn-sm btn-outline-warning">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form action="{{ route('unidades.destroy', $unidad) }}" method="POST" class="d-inline"
+                            <form action="{{ route('unidad.destroy', $unidad) }}" method="POST" class="d-inline"
                                   onsubmit="return confirm('¿Eliminar esta unidad?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>

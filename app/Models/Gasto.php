@@ -11,23 +11,26 @@ class Gasto extends Model
 
     public $timestamps = false;
 
+    const CREATED_AT = 'creado_en';
+    const UPDATED_AT = 'actualizado_en';
+
     protected $fillable = [
+        'propiedad_id',
         'unidad_id',
-        'fecha_gasto',
+        'fecha',
         'monto',
-        'tipo',
+        'categoria',
         'descripcion',
         'observaciones',
-        'comprobante_url',
+        'comprobante',
         'activo',
+        'estado',
         'creado_por_usuario_id',
-        'actualizado_por_usuario_id',
-        'creado_en',
-        'actualizado_en',
+        'actualizado_por_usuario_id'
     ];
 
     protected $casts = [
-        'fecha_gasto'    => 'date',
+        'fecha'    => 'date',
         'monto'          => 'decimal:2',
         'activo'         => 'boolean',
         'creado_en'      => 'datetime',
@@ -52,6 +55,6 @@ class Gasto extends Model
     {
         $mes  = $mes  ?? now()->month;
         $anio = $anio ?? now()->year;
-        return $query->whereMonth('fecha_gasto', $mes)->whereYear('fecha_gasto', $anio);
+        return $query->whereMonth('fecha', $mes)->whereYear('fecha', $anio);
     }
 }

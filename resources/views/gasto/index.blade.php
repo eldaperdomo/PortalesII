@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Gastos')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Gastos</h4>
-    <a href="{{ route('gastos.create') }}" class="btn btn-primary">
+    <a href="{{ route('gasto.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Registrar Gasto
     </a>
 </div>
@@ -43,7 +43,7 @@
                         </td>
                         <td>{{ $gasto->descripcion ?? '—' }}</td>
                         <td><span class="badge bg-light text-dark border">{{ ucfirst($gasto->tipo) }}</span></td>
-                        <td>{{ $gasto->fecha_gasto->format('d/m/Y') }}</td>
+                        <td>{{ $gasto->fecha->format('d/m/Y') }}</td>
                         <td>L {{ number_format($gasto->monto, 2) }}</td>
                         <td>
                             @if($gasto->activo)
@@ -53,13 +53,13 @@
                             @endif
                         </td>
                         <td class="text-end">
-                            <a href="{{ route('gastos.show', $gasto) }}" class="btn btn-sm btn-outline-info">
+                            <a href="{{ route('gasto.show', $gasto) }}" class="btn btn-sm btn-outline-info">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{{ route('gastos.edit', $gasto) }}" class="btn btn-sm btn-outline-warning">
+                            <a href="{{ route('gasto.edit', $gasto) }}" class="btn btn-sm btn-outline-warning">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form action="{{ route('gastos.destroy', $gasto) }}" method="POST" class="d-inline"
+                            <form action="{{ route('gasto.destroy', $gasto) }}" method="POST" class="d-inline"
                                   onsubmit="return confirm('¿Eliminar este gasto?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>

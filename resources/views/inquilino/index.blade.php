@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Inquilinos')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-people me-2"></i>Inquilinos</h4>
-    <a href="{{ route('inquilinos.create') }}" class="btn btn-primary">
+    <a href="{{ route('inquilino.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nuevo Inquilino
     </a>
 </div>
@@ -37,13 +37,13 @@
                             @endif
                         </td>
                         <td class="text-end">
-                            <a href="{{ route('inquilinos.show', $inquilino) }}" class="btn btn-sm btn-outline-info">
+                            <a href="{{ route('inquilino.show', $inquilino) }}" class="btn btn-sm btn-outline-info">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{{ route('inquilinos.edit', $inquilino) }}" class="btn btn-sm btn-outline-warning">
+                            <a href="{{ route('inquilino.edit', $inquilino) }}" class="btn btn-sm btn-outline-warning">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form action="{{ route('inquilinos.destroy', $inquilino) }}" method="POST" class="d-inline"
+                            <form action="{{ route('inquilino.destroy', $inquilino) }}" method="POST" class="d-inline"
                                   onsubmit="return confirm('¿Eliminar este inquilino?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>

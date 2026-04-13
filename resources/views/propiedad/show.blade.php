@@ -1,14 +1,14 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', $propiedad->nombre)
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-house-door me-2"></i>{{ $propiedad->nombre }}</h4>
     <div class="d-flex gap-2">
-        <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-warning">
+        <a href="{{ route('propiedad.edit', $propiedad) }}" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Editar
         </a>
-        <a href="{{ route('propiedades.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('propiedad.index') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i>Volver
         </a>
     </div>
@@ -44,7 +44,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong><i class="bi bi-door-open me-2"></i>Unidades</strong>
-                <a href="{{ route('unidades.create') }}" class="btn btn-sm btn-primary">
+                <a href="{{ route('unidad.create') }}" class="btn btn-sm btn-primary">
                     <i class="bi bi-plus me-1"></i>Agregar
                 </a>
             </div>
@@ -80,7 +80,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('unidades.show', $unidad) }}" class="btn btn-sm btn-outline-info">
+                                    <a href="{{ route('unidad.show', $unidad) }}" class="btn btn-sm btn-outline-info">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>

@@ -1,14 +1,14 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', $inquilino->nombre)
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-person me-2"></i>{{ $inquilino->nombre }}</h4>
     <div class="d-flex gap-2">
-        <a href="{{ route('inquilinos.edit', $inquilino) }}" class="btn btn-warning">
+        <a href="{{ route('inquilino.edit', $inquilino) }}" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Editar
         </a>
-        <a href="{{ route('inquilinos.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('inquilino.index') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i>Volver
         </a>
     </div>
@@ -44,7 +44,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong><i class="bi bi-file-text me-2"></i>Contratos</strong>
-                <a href="{{ route('contratos.create') }}?inquilino_id={{ $inquilino->id }}"
+                <a href="{{ route('contrato.create') }}?inquilino_id={{ $inquilino->id }}"
                    class="btn btn-sm btn-primary">
                     <i class="bi bi-plus me-1"></i>Nuevo Contrato
                 </a>
@@ -79,7 +79,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('contratos.show', $contrato) }}" class="btn btn-sm btn-outline-info">
+                                    <a href="{{ route('contrato.show', $contrato) }}" class="btn btn-sm btn-outline-info">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>

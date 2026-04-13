@@ -1,17 +1,17 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Editar Gasto')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar Gasto</h4>
-    <a href="{{ route('gastos.show', $gasto) }}" class="btn btn-outline-secondary">
+    <a href="{{ route('gasto.show', $gasto) }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
 </div>
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('gastos.update', $gasto) }}" method="POST">
+        <form action="{{ route('gasto.update', $gasto) }}" method="POST">
             @csrf
             @method('PUT')
             <div class="row g-3">
@@ -31,8 +31,8 @@
 
                 <div class="col-md-3">
                     <label class="form-label">Fecha del Gasto *</label>
-                    <input type="date" name="fecha_gasto" class="form-control"
-                           value="{{ old('fecha_gasto', $gasto->fecha_gasto->format('Y-m-d')) }}" required>
+                    <input type="date" name="fecha" class="form-control"
+                           value="{{ old('fecha', $gasto->fecha->format('Y-m-d')) }}" required>
                 </div>
 
                 <div class="col-md-3">
@@ -87,7 +87,7 @@
                 <button type="submit" class="btn btn-warning">
                     <i class="bi bi-save me-1"></i>Actualizar Gasto
                 </button>
-                <a href="{{ route('gastos.show', $gasto) }}" class="btn btn-outline-secondary">Cancelar</a>
+                <a href="{{ route('gasto.show', $gasto) }}" class="btn btn-outline-secondary">Cancelar</a>
             </div>
         </form>
     </div>

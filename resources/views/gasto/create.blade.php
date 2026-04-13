@@ -1,17 +1,17 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Registrar Gasto')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Registrar Gasto</h4>
-    <a href="{{ route('gastos.index') }}" class="btn btn-outline-secondary">
+    <a href="{{ route('gasto.index') }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
 </div>
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('gastos.store') }}" method="POST">
+        <form action="{{ route('gasto.store') }}" method="POST">
             @csrf
             <div class="row g-3">
 
@@ -31,10 +31,10 @@
 
                 <div class="col-md-3">
                     <label class="form-label">Fecha del Gasto *</label>
-                    <input type="date" name="fecha_gasto"
-                           class="form-control @error('fecha_gasto') is-invalid @enderror"
-                           value="{{ old('fecha_gasto', date('Y-m-d')) }}" required>
-                    @error('fecha_gasto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <input type="date" name="fecha"
+                           class="form-control @error('fecha') is-invalid @enderror"
+                           value="{{ old('fecha', date('Y-m-d')) }}" required>
+                    @error('fecha') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-3">
@@ -50,15 +50,15 @@
 
                 <div class="col-md-4">
                     <label class="form-label">Tipo *</label>
-                    <select name="tipo" class="form-select @error('tipo') is-invalid @enderror" required>
+                    <select name="categoria" class="form-select @error('categoria') is-invalid @enderror" required>
                         <option value="">-- Seleccionar --</option>
-                        @foreach(['mantenimiento','reparacion','compra','servicio','otro'] as $tipo)
-                            <option value="{{ $tipo }}" {{ old('tipo') == $tipo ? 'selected' : '' }}>
-                                {{ ucfirst($tipo) }}
+                        @foreach(['mantenimiento','reparacion','compra','servicio','otro'] as $categoria)
+                            <option value="{{ $categoria }}" {{ old('categoria') == $categoria ? 'selected' : '' }}>
+                                {{ ucfirst($categoria) }}
                             </option>
                         @endforeach
                     </select>
-                    @error('tipo') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    @error('categoria') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-8">
@@ -69,8 +69,8 @@
 
                 <div class="col-md-8">
                     <label class="form-label">URL Comprobante</label>
-                    <input type="text" name="comprobante_url" maxlength="255" class="form-control"
-                           value="{{ old('comprobante_url') }}" placeholder="https://...">
+                    <input type="text" name="comprobante" maxlength="255" class="form-control"
+                           value="{{ old('comprobante') }}" placeholder="https://...">
                 </div>
 
                 <div class="col-md-4 d-flex align-items-end">
@@ -92,7 +92,7 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-save me-1"></i>Guardar Gasto
                 </button>
-                <a href="{{ route('gastos.index') }}" class="btn btn-outline-secondary">Cancelar</a>
+                <a href="{{ route('gasto.index') }}" class="btn btn-outline-secondary">Cancelar</a>
             </div>
         </form>
     </div>

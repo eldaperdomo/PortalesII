@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Contratos')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-file-text me-2"></i>Contratos</h4>
-    <a href="{{ route('contratos.create') }}" class="btn btn-primary">
+    <a href="{{ route('contrato.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Nuevo Contrato
     </a>
 </div>
@@ -48,13 +48,13 @@
                             </span>
                         </td>
                         <td class="text-end">
-                            <a href="{{ route('contratos.show', $contrato) }}" class="btn btn-sm btn-outline-info">
+                            <a href="{{ route('contrato.show', $contrato) }}" class="btn btn-sm btn-outline-info">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{{ route('contratos.edit', $contrato) }}" class="btn btn-sm btn-outline-warning">
+                            <a href="{{ route('contrato.edit', $contrato) }}" class="btn btn-sm btn-outline-warning">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form action="{{ route('contratos.destroy', $contrato) }}" method="POST" class="d-inline"
+                            <form action="{{ route('contrato.destroy', $contrato) }}" method="POST" class="d-inline"
                                   onsubmit="return confirm('¿Eliminar este contrato?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>

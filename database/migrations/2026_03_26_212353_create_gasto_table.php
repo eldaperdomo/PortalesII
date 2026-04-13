@@ -6,41 +6,37 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('gastos', function (Blueprint $table) {
             $table->id();
+            
+            // Relaciones
             $table->foreignId('propiedad_id')->constrained('propiedades')->onDelete('cascade');
             $table->foreignId('unidad_id')->nullable()->constrained('unidades')->onDelete('set null');
-            $table->string('concepto');
-            $table->decimal('monto', 12, 2);
+            
+            // Campos de datos (Nombres exactos según tus errores)
             $table->date('fecha');
-            $table->enum('categoria', [
-                'mantenimiento',
-                'reparacion',
-                'impuesto',
-                'seguro',
-                'servicios',
-                'administracion',
-                'limpieza',
-                'otro'
-            ])->default('otro');
-            $table->enum('estado', ['pendiente', 'pagado', 'cancelado'])->default('pendiente');
-            $table->string('proveedor')->nullable();
-            $table->string('comprobante')->nullable()->comment('Número de factura o recibo');
-            $table->string('archivo_adjunto')->nullable();
+            $table->decimal('monto', 12, 2);
+            $table->string('categoria'); 
             $table->text('descripcion')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
+            $table->text('observaciones')->nullable();
+            $table->string('comprobante')->nullable();
+            $table->boolean('activo')->default(true);
+            $table->string('estado')->default('pendiente');
+            
+            // Auditoría con nombres en español (Como pedía el error)
+            $table->unsignedBigInteger('creado_por_usuario_id')->nullable();
+            $table->unsignedBigInteger('actualizado_por_usuario_id')->nullable();
+
+            // Timestamps en español
+            $table->timestamp('creado_en')->nullable();
+            $table->timestamp('actualizado_en')->nullable();
+            
+            $table->softDeletes(); // Esto crea 'deleted_at'
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('gastos');

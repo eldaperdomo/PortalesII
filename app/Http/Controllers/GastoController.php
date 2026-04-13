@@ -21,30 +21,36 @@ class GastoController extends Controller
         return view('gasto.create', compact('unidades'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'unidad_id'       => 'required|exists:unidades,id',
-            'fecha_gasto'     => 'required|date',
-            'monto'           => 'required|numeric|min:0',
-            'tipo'            => 'required|in:mantenimiento,reparacion,compra,servicio,otro',
-            'descripcion'     => 'nullable|string|max:255',
-            'observaciones'   => 'nullable|string',
-            'comprobante_url' => 'nullable|string|max:255',
-            'activo'          => 'nullable|boolean',
-        ]);
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'unidad_id' => 'required|exists:unidades,id',
+        'fecha' => 'required|date',
+        'monto' => 'required|numeric|min:0',
+        'categoria' => 'required|in:mantenimiento,reparacion,compra,servicio,otro',
+        'descripcion' => 'nullable|string|max:255',
+        'observaciones' => 'nullable|string',
+        'comprobante' => 'nullable|string|max:255',
+        'activo' => 'nullable|boolean',
+    ]);
 
-        $validated['activo']                     = $request->has('activo') ? 1 : 0;
-        $validated['creado_por_usuario_id']      = auth()->id();
-        $validated['actualizado_por_usuario_id'] = auth()->id();
-        $validated['creado_en']                  = now();
-        $validated['actualizado_en']             = now();
+    // 🔥 OBTENER LA UNIDAD
+    $unidad = Unidad::find($validated['unidad_id']);
 
-        Gasto::create($validated);
+    // 🔥 AGREGAR PROPIEDAD AUTOMÁTICAMENTE
+    $validated['propiedad_id'] = $unidad->propiedad_id;
 
-        return redirect()->route('gasto.index')
-            ->with('success', 'Gasto registrado correctamente.');
-    }
+    $validated['activo'] = $request->has('activo') ? 1 : 0;
+    $validated['creado_por_usuario_id'] = auth()->id();
+    $validated['actualizado_por_usuario_id'] = auth()->id();
+    $validated['creado_en'] = now();
+    $validated['actualizado_en'] = now();
+
+    Gasto::create($validated);
+
+    return redirect()->route('gasto.index')
+        ->with('success', 'Gasto registrado correctamente.');
+}
 
     public function show(Gasto $gasto)
     {
@@ -60,14 +66,17 @@ class GastoController extends Controller
 
     public function update(Request $request, Gasto $gasto)
     {
+        $unidad = Unidad::find($validated['unidad_id']);
+        $validated['propiedad_id'] = $unidad->propiedad_id;
+
         $validated = $request->validate([
             'unidad_id'       => 'required|exists:unidades,id',
-            'fecha_gasto'     => 'required|date',
+            'fecha'     => 'required|date',
             'monto'           => 'required|numeric|min:0',
-            'tipo'            => 'required|in:mantenimiento,reparacion,compra,servicio,otro',
+            'categoria'            => 'required|in:mantenimiento,reparacion,compra,servicio,otro',
             'descripcion'     => 'nullable|string|max:255',
             'observaciones'   => 'nullable|string',
-            'comprobante_url' => 'nullable|string|max:255',
+            'comprobante' => 'nullable|string|max:255',
             'activo'          => 'nullable|boolean',
         ]);
 

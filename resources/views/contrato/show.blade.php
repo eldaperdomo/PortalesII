@@ -1,14 +1,14 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Detalle Contrato')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-file-text me-2"></i>Detalle del Contrato</h4>
     <div class="d-flex gap-2">
-        <a href="{{ route('contratos.edit', $contrato) }}" class="btn btn-warning">
+        <a href="{{ route('contrato.edit', $contrato) }}" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Editar
         </a>
-        <a href="{{ route('contratos.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('contrato.index') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i>Volver
         </a>
     </div>
@@ -62,7 +62,7 @@
                 <p class="mb-1"><strong>{{ $contrato->inquilino->nombre }}</strong></p>
                 <p class="mb-1 text-muted">{{ $contrato->inquilino->telefono ?? '—' }}</p>
                 <p class="mb-2 text-muted">{{ $contrato->inquilino->correo ?? '—' }}</p>
-                <a href="{{ route('inquilinos.show', $contrato->inquilino) }}" class="btn btn-sm btn-outline-info">
+                <a href="{{ route('inquilino.show', $contrato->inquilino) }}" class="btn btn-sm btn-outline-info">
                     Ver perfil
                 </a>
             </div>
@@ -74,7 +74,7 @@
                 <p class="mb-1"><strong>{{ $contrato->unidad->identificador }}</strong></p>
                 <p class="mb-1 text-muted">Propiedad: {{ $contrato->unidad->propiedad->nombre }}</p>
                 <p class="mb-2 text-muted">{{ $contrato->unidad->propiedad->direccion ?? '' }}</p>
-                <a href="{{ route('unidades.show', $contrato->unidad) }}" class="btn btn-sm btn-outline-info">
+                <a href="{{ route('unidad.show', $contrato->unidad) }}" class="btn btn-sm btn-outline-info">
                     Ver unidad
                 </a>
             </div>

@@ -1,17 +1,17 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Nueva Unidad')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Nueva Unidad</h4>
-    <a href="{{ route('unidades.index') }}" class="btn btn-outline-secondary">
+    <a href="{{ route('unidad.index') }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
 </div>
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('unidades.store') }}" method="POST">
+        <form action="{{ route('unidad.store') }}" method="POST">
             @csrf
             <div class="row g-3">
 
@@ -72,7 +72,7 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-save me-1"></i>Guardar Unidad
                 </button>
-                <a href="{{ route('unidades.index') }}" class="btn btn-outline-secondary">Cancelar</a>
+                <a href="{{ route('unidad.index') }}" class="btn btn-outline-secondary">Cancelar</a>
             </div>
         </form>
     </div>

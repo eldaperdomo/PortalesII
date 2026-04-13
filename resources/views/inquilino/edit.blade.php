@@ -1,17 +1,17 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', 'Editar Inquilino')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar — {{ $inquilino->nombre }}</h4>
-    <a href="{{ route('inquilinos.show', $inquilino) }}" class="btn btn-outline-secondary">
+    <a href="{{ route('inquilino.show', $inquilino) }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
 </div>
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('inquilinos.update', $inquilino) }}" method="POST">
+        <form action="{{ route('inquilino.update', $inquilino) }}" method="POST">
             @csrf
             @method('PUT')
             <div class="row g-3">
@@ -58,7 +58,7 @@
                 <button type="submit" class="btn btn-warning">
                     <i class="bi bi-save me-1"></i>Actualizar
                 </button>
-                <a href="{{ route('inquilinos.show', $inquilino) }}" class="btn btn-outline-secondary">Cancelar</a>
+                <a href="{{ route('inquilino.show', $inquilino) }}" class="btn btn-outline-secondary">Cancelar</a>
             </div>
         </form>
     </div>

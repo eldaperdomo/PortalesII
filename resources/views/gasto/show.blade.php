@@ -1,9 +1,9 @@
 @extends('welcome')
-@section('title', 'Gasto — '.$gasto->concepto)
+@section('title', 'Detalle Gasto')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>{{ $gasto->concepto }}</h4>
+    <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>Detalle del Gasto</h4>
     <div class="d-flex gap-2">
         <a href="{{ route('gasto.edit', $gasto) }}" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Editar
@@ -20,46 +20,57 @@
             <div class="card-body">
                 <table class="table table-borderless">
                     <tr>
-                        <th width="35%">Propiedad</th>
+                        <th width="35%">Unidad</th>
                         <td>
-                            <a href="{{ route('propiedad.show', $gasto->propiedad) }}">
-                                {{ $gasto->propiedad->nombre }}
+                            <a href="{{ route('unidad.show', $gasto->unidad) }}">
+                                {{ $gasto->unidad->identificador }}
                             </a>
                         </td>
                     </tr>
                     <tr>
-                        <th>Unidad</th>
+                        <th>Propiedad</th>
                         <td>
-                            @if($gasto->unidad)
-                                <a href="{{ route('unidad.show', $gasto->unidad) }}">{{ $gasto->unidad->nombre }}</a>
-                            @else
-                                <span class="text-muted">General (toda la propiedad)</span>
-                            @endif
+                            <a href="{{ route('propiedad.show', $gasto->unidad->propiedad) }}">
+                                {{ $gasto->unidad->propiedad->nombre }}
+                            </a>
                         </td>
                     </tr>
-                    <tr><th>Categoría</th><td><span class="badge bg-light text-dark border">{{ ucfirst($gasto->categoria) }}</span></td></tr>
-                    <tr><th>Monto</th><td><strong class="fs-5">L {{ number_format($gasto->monto, 2) }}</strong></td></tr>
-                    <tr><th>Fecha</th><td>{{ $gasto->fecha->format('d/m/Y') }}</td></tr>
-                    <tr><th>Estado</th>
-                        <td><span class="badge badge-{{ $gasto->estado }}">{{ ucfirst($gasto->estado) }}</span></td>
+                    <tr><th>Tipo</th>
+                        <td><span class="badge bg-light text-dark border">{{ ucfirst($gasto->tipo) }}</span></td>
                     </tr>
-                    <tr><th>Proveedor</th><td>{{ $gasto->proveedor ?? '—' }}</td></tr>
-                    <tr><th>Comprobante</th><td>{{ $gasto->comprobante ?? '—' }}</td></tr>
-                    @if($gasto->archivo_adjunto)
+                    <tr><th>Monto</th>
+                        <td><strong class="fs-5">L {{ number_format($gasto->monto, 2) }}</strong></td>
+                    </tr>
+                    <tr><th>Fecha</th>
+                        <td>{{ $gasto->fecha->format('d/m/Y') }}</td>
+                    </tr>
+                    <tr><th>Descripción</th>
+                        <td>{{ $gasto->descripcion ?? '—' }}</td>
+                    </tr>
+                    @if($gasto->comprobante_url)
                     <tr>
-                        <th>Adjunto</th>
+                        <th>Comprobante</th>
                         <td>
-                            <a href="{{ Storage::url($gasto->archivo_adjunto) }}" target="_blank"
-                               class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-paperclip me-1"></i>Ver archivo
+                            <a href="{{ $gasto->comprobante_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-link-45deg me-1"></i>Ver comprobante
                             </a>
                         </td>
                     </tr>
                     @endif
-                    @if($gasto->descripcion)
+                    <tr><th>Activo</th>
+                        <td>
+                            <span class="badge {{ $gasto->activo ? 'bg-success' : 'bg-secondary' }}">
+                                {{ $gasto->activo ? 'Sí' : 'No' }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr><th>Registrado</th>
+                        <td>{{ $gasto->creado_en?->format('d/m/Y H:i') ?? '—' }}</td>
+                    </tr>
+                    @if($gasto->observaciones)
                     <tr>
-                        <th>Descripción</th>
-                        <td>{{ $gasto->descripcion }}</td>
+                        <th>Observaciones</th>
+                        <td>{{ $gasto->observaciones }}</td>
                     </tr>
                     @endif
                 </table>

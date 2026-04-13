@@ -1,14 +1,14 @@
-@extends('layouts.app')
+@extends('welcome')
 @section('title', $unidad->identificador)
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-door-open me-2"></i>{{ $unidad->identificador }}</h4>
     <div class="d-flex gap-2">
-        <a href="{{ route('unidades.edit', $unidad) }}" class="btn btn-warning">
+        <a href="{{ route('unidad.edit', $unidad) }}" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Editar
         </a>
-        <a href="{{ route('unidades.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('unidad.index') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i>Volver
         </a>
     </div>
@@ -21,7 +21,7 @@
                 <h6 class="text-muted mb-3">Detalle</h6>
                 <table class="table table-sm table-borderless">
                     <tr><th>Propiedad</th>
-                        <td><a href="{{ route('propiedades.show', $unidad->propiedad) }}">{{ $unidad->propiedad->nombre }}</a></td>
+                        <td><a href="{{ route('propiedad.show', $unidad->propiedad) }}">{{ $unidad->propiedad->nombre }}</a></td>
                     </tr>
                     <tr><th>Estado</th>
                         <td>
@@ -49,7 +49,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong><i class="bi bi-file-text me-2"></i>Contratos</strong>
                 @if($unidad->estado == 'disponible')
-                    <a href="{{ route('contratos.create') }}?unidad_id={{ $unidad->id }}"
+                    <a href="{{ route('contrato.create') }}?unidad_id={{ $unidad->id }}"
                        class="btn btn-sm btn-primary">
                         <i class="bi bi-plus me-1"></i>Nuevo
                     </a>
@@ -76,7 +76,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('contratos.show', $contrato) }}" class="btn btn-sm btn-outline-info">
+                                    <a href="{{ route('contrato.show', $contrato) }}" class="btn btn-sm btn-outline-info">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>
@@ -93,7 +93,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong><i class="bi bi-cash-stack me-2"></i>Gastos</strong>
-                <a href="{{ route('gastos.create') }}?unidad_id={{ $unidad->id }}"
+                <a href="{{ route('gasto.create') }}?unidad_id={{ $unidad->id }}"
                    class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-plus me-1"></i>Registrar
                 </a>
@@ -108,7 +108,7 @@
                             <tr>
                                 <td>{{ $gasto->descripcion ?? '—' }}</td>
                                 <td>{{ ucfirst($gasto->tipo) }}</td>
-                                <td>{{ $gasto->fecha_gasto->format('d/m/Y') }}</td>
+                                <td>{{ $gasto->fecha->format('d/m/Y') }}</td>
                                 <td>L {{ number_format($gasto->monto, 2) }}</td>
                             </tr>
                         @empty
