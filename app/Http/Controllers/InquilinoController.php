@@ -10,16 +10,11 @@ class InquilinoController extends Controller
 {
     public function index()
     {
-<<<<<<< HEAD
-        $inquilinos = Inquilino::withCount('contratos')->latest('creado_en')->paginate(10);
-        return view('inquilino.index', compact('inquilinos'));
-=======
         $Inquilinos = Inquilino::withCount('contratos')
             ->latest()
             ->paginate(10);
 
         return view('inquilino.index', compact('Inquilinos'));
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
     }
 
     public function create()
@@ -37,30 +32,18 @@ class InquilinoController extends Controller
             'activo'   => 'nullable|boolean',
         ]);
 
-<<<<<<< HEAD
-        $validated['activo']                     = $request->has('activo') ? 1 : 0;
-        $validated['creado_por_usuario_id']      = auth()->id();
-        $validated['actualizado_por_usuario_id'] = auth()->id();
-        $validated['creado_en']                  = now();
-        $validated['actualizado_en']             = now();
-
-        Inquilino::create($validated);
-=======
         $inquilino = Inquilino::create($validated);
 
         // 🔥 AUDITORÍA CREATE
         AuditoriaServicio::registrar([
-            'tabla' => 'inquilinos',
             'accion' => 'CREATE',
             'registro_id' => $inquilino->id,
             'datos_nuevos' => $inquilino->toArray()
         ]);
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
 
         return redirect()->route('inquilino.index')
             ->with('success', 'Inquilino registrado correctamente.');
     }
-
     public function show(Inquilino $inquilino)
     {
         $inquilino->load(['contratos.unidad.propiedad']);
@@ -82,13 +65,7 @@ class InquilinoController extends Controller
             'activo'   => 'nullable|boolean',
         ]);
 
-<<<<<<< HEAD
-        $validated['activo']                     = $request->has('activo') ? 1 : 0;
-        $validated['actualizado_por_usuario_id'] = auth()->id();
-        $validated['actualizado_en']             = now();
-=======
         $antes = $inquilino->toArray();
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
 
         $inquilino->update($validated);
 
@@ -110,9 +87,6 @@ class InquilinoController extends Controller
         if ($inquilino->contratos()->where('estado', 'activo')->exists()) {
             return back()->with('error', 'No se puede eliminar un inquilino con contratos activos.');
         }
-<<<<<<< HEAD
-        $inquilino->delete();
-=======
 
         $antes = $inquilino->toArray();
 
@@ -127,7 +101,6 @@ class InquilinoController extends Controller
             'datos_nuevos' => null
         ]);
 
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
         return redirect()->route('inquilino.index')
             ->with('success', 'Inquilino eliminado correctamente.');
     }

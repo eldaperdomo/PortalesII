@@ -12,16 +12,11 @@ class ContratoController extends Controller
 {
     public function index()
     {
-<<<<<<< HEAD
-        $contratos = Contrato::with(['unidad.propiedad', 'inquilino'])->latest('creado_en')->paginate(10);
-        return view('contrato.index', compact('contratos'));
-=======
         $Contrato = Contrato::with(['unidad.propiedad', 'inquilino'])
             ->latest()
             ->paginate(10);
 
         return view('contrato.index', compact('Contrato'));
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
     }
 
     public function create()
@@ -35,28 +30,6 @@ class ContratoController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-<<<<<<< HEAD
-            'unidad_id'    => 'required|exists:unidades,id',
-            'inquilino_id' => 'required|exists:inquilinos,id',
-            'fecha_inicio' => 'required|date',
-            'fecha_fin'    => 'required|date|after:fecha_inicio',
-            'monto_renta'  => 'required|numeric|min:0',
-            'dia_pago'     => 'required|integer|min:1|max:31',
-            'estado'       => 'required|in:activo,terminado,cancelado',
-            'activo'       => 'nullable|boolean',
-        ]);
-
-        // Verificar que la unidad no tenga contrato activo
-        if (Contrato::where('unidad_id', $validated['unidad_id'])->where('estado', 'activo')->exists()) {
-            return back()->withInput()->with('error', 'La unidad ya tiene un contrato activo.');
-        }
-
-        $validated['activo']                     = $request->has('activo') ? 1 : 0;
-        $validated['creado_por_usuario_id']      = auth()->id();
-        $validated['actualizado_por_usuario_id'] = auth()->id();
-        $validated['creado_en']                  = now();
-        $validated['actualizado_en']             = now();
-=======
             'unidad_id'              => 'required|exists:unidades,id',
             'inquilino_id'           => 'required|exists:inquilinos,id',
             'fecha_inicio'           => 'required|date',
@@ -90,7 +63,6 @@ class ContratoController extends Controller
 
         // 🔥 CODIGO
         $validated['codigo'] = Contrato::generarCodigo();
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
 
         $validated['creado_por_usuario_id'] = auth()->id();
         $validated['actualizado_por_usuario_id'] = auth()->id();
@@ -126,21 +98,6 @@ class ContratoController extends Controller
     public function update(Request $request, Contrato $contrato)
     {
         $validated = $request->validate([
-<<<<<<< HEAD
-            'unidad_id'    => 'required|exists:unidades,id',
-            'inquilino_id' => 'required|exists:inquilinos,id',
-            'fecha_inicio' => 'required|date',
-            'fecha_fin'    => 'required|date|after:fecha_inicio',
-            'monto_renta'  => 'required|numeric|min:0',
-            'dia_pago'     => 'required|integer|min:1|max:31',
-            'estado'       => 'required|in:activo,terminado,cancelado',
-            'activo'       => 'nullable|boolean',
-        ]);
-
-        $validated['activo']                     = $request->has('activo') ? 1 : 0;
-        $validated['actualizado_por_usuario_id'] = auth()->id();
-        $validated['actualizado_en']             = now();
-=======
             'unidad_id'              => 'required|exists:unidades,id',
             'inquilino_id'           => 'required|exists:inquilinos,id',
             'fecha_inicio'           => 'required|date',
@@ -162,7 +119,6 @@ class ContratoController extends Controller
         $validated['monto_mensual'] = $unidad->precio_renta;
 
         $validated['actualizado_por_usuario_id'] = auth()->id();
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
 
         $contrato->update($validated);
 
@@ -184,9 +140,6 @@ class ContratoController extends Controller
         if ($contrato->estado === 'activo') {
             return back()->with('error', 'No se puede eliminar un contrato activo.');
         }
-<<<<<<< HEAD
-        $contrato->delete();
-=======
 
         $antes = $contrato->toArray();
 
@@ -201,7 +154,6 @@ class ContratoController extends Controller
             'datos_nuevos' => null
         ]);
 
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
         return redirect()->route('contrato.index')
             ->with('success', 'Contrato eliminado correctamente.');
     }

@@ -11,14 +11,10 @@ class UnidadController extends Controller
 {
     public function index()
     {
-<<<<<<< HEAD
-        $unidades = Unidad::with('propiedad')->latest('creado_en')->paginate(10);
-=======
         $unidades = Unidad::with('propiedad')
             ->latest('id')
             ->paginate(10);
 
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
         return view('unidad.index', compact('unidades'));
     }
 
@@ -38,15 +34,6 @@ class UnidadController extends Controller
             'activo'        => 'nullable|boolean',
         ]);
 
-<<<<<<< HEAD
-        $validated['activo']                     = $request->has('activo') ? 1 : 0;
-        $validated['creado_por_usuario_id']      = auth()->id();
-        $validated['actualizado_por_usuario_id'] = auth()->id();
-        $validated['creado_en']                  = now();
-        $validated['actualizado_en']             = now();
-
-        Unidad::create($validated);
-=======
         $unidad = Unidad::create($validated);
 
         // 🔥 AUDITORÍA
@@ -59,7 +46,6 @@ class UnidadController extends Controller
             'datos_nuevos' => $unidad->toArray(),
             'ip' => $request->ip()
         ]);
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
 
         return redirect()->route('unidad.index')
             ->with('success', 'Unidad registrada correctamente.');
@@ -68,22 +54,14 @@ class UnidadController extends Controller
     public function show(Unidad $unidad)
     {
         $unidad->load(['propiedad', 'contratos.inquilino', 'gastos']);
-<<<<<<< HEAD
-        return view('unidad.show', compact('unidad'));
-=======
         $propiedades = Propiedad::activas()->get(); // 👈 agregar
 
         return view('unidad.show', compact('unidad', 'propiedades'));
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
     }
 
     public function edit(Unidad $unidad)
     {
         $propiedades = Propiedad::activas()->get();
-<<<<<<< HEAD
-=======
-
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
         return view('unidad.edit', compact('unidad', 'propiedades'));
     }
 
@@ -97,13 +75,7 @@ class UnidadController extends Controller
             'activo'        => 'nullable|boolean',
         ]);
 
-<<<<<<< HEAD
-        $validated['activo']                     = $request->has('activo') ? 1 : 0;
-        $validated['actualizado_por_usuario_id'] = auth()->id();
-        $validated['actualizado_en']             = now();
-=======
         $antes = $unidad->toArray();
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
 
         $unidad->update($validated);
 
@@ -127,9 +99,6 @@ class UnidadController extends Controller
         if ($unidad->estado === 'ocupada') {
             return back()->with('error', 'No se puede eliminar una unidad ocupada.');
         }
-<<<<<<< HEAD
-        $unidad->delete();
-=======
 
         $antes = $unidad->toArray();
 
@@ -146,7 +115,6 @@ class UnidadController extends Controller
             'ip' => $request->ip()
         ]);
 
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87
         return redirect()->route('unidad.index')
             ->with('success', 'Unidad eliminada correctamente.');
     }
