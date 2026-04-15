@@ -68,7 +68,7 @@
 <div class="login-card">
 
     <div class="logo">
-        <i class="bi bi-building"></i> Alquileres
+        <i class="bi bi-building"></i> Servicio de Alquileres
     </div>
 
     <div class="subtitle">
