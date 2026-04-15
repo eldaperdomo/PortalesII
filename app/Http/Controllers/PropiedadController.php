@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Propiedad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\AuditoriaServicio;
 
 class PropiedadController extends Controller
 {
     public function index()
     {
         $propiedades = Propiedad::withCount('unidades')
-            ->with('unidades')
             ->latest()
             ->paginate(10);
 
@@ -38,13 +38,23 @@ class PropiedadController extends Controller
             'activa'        => 'boolean',
         ]);
 
+        // 🔥 checkbox activa
+        $validated['activa'] = $request->has('activa');
+
+        // 🔥 imagen
         if ($request->hasFile('imagen')) {
             $validated['imagen'] = $request->file('imagen')->store('propiedades', 'public');
         }
 
-        $validated['user_id'] = auth()->id();
+        $propiedad = Propiedad::create($validated);
 
-        Propiedad::create($validated);
+        // 🔥 AUDITORÍA CREATE
+        AuditoriaServicio::registrar([
+            'tabla' => 'propiedades',
+            'accion' => 'CREATE',
+            'registro_id' => $propiedad->id,
+            'datos_nuevos' => $propiedad->toArray()
+        ]);
 
         return redirect()->route('propiedad.index')
             ->with('success', 'Propiedad registrada correctamente.');
@@ -53,8 +63,8 @@ class PropiedadController extends Controller
     public function show(Propiedad $propiedad)
     {
         $propiedad->load([
-            'unidad',
-            'gasto' => fn($q) => $q->latest()->limit(10),
+            'unidades',
+            'gastos' => fn($q) => $q->latest()->limit(10),
         ]);
 
         return view('propiedad.show', compact('propiedad'));
@@ -80,14 +90,27 @@ class PropiedadController extends Controller
             'activa'        => 'boolean',
         ]);
 
+        $antes = $propiedad->toArray();
+
+        $validated['activa'] = $request->has('activa');
+
         if ($request->hasFile('imagen')) {
             if ($propiedad->imagen) {
                 Storage::disk('public')->delete($propiedad->imagen);
             }
-            $validated['imagen'] = $request->file('imagen')->store('propiedad', 'public');
+            $validated['imagen'] = $request->file('imagen')->store('propiedades', 'public');
         }
 
         $propiedad->update($validated);
+
+        // 🔥 AUDITORÍA UPDATE
+        AuditoriaServicio::registrar([
+            'tabla' => 'propiedades',
+            'accion' => 'UPDATE',
+            'registro_id' => $propiedad->id,
+            'datos_anteriores' => $antes,
+            'datos_nuevos' => $propiedad->toArray()
+        ]);
 
         return redirect()->route('propiedad.show', $propiedad)
             ->with('success', 'Propiedad actualizada correctamente.');
@@ -95,11 +118,21 @@ class PropiedadController extends Controller
 
     public function destroy(Propiedad $propiedad)
     {
-        if ($propiedad->unidad()->whereIn('estado', ['ocupada'])->exists()) {
+        if ($propiedad->unidades()->where('estado', 'ocupada')->exists()) {
             return back()->with('error', 'No se puede eliminar una propiedad con unidades ocupadas.');
         }
 
+        $antes = $propiedad->toArray();
+
         $propiedad->delete();
+
+        // 🔥 AUDITORÍA DELETE
+        AuditoriaServicio::registrar([
+            'tabla' => 'propiedades',
+            'accion' => 'DELETE',
+            'registro_id' => $propiedad->id,
+            'datos_anteriores' => $antes
+        ]);
 
         return redirect()->route('propiedad.index')
             ->with('success', 'Propiedad eliminada correctamente.');

@@ -44,7 +44,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($Gastos as $Gasto)
+                @forelse($gastos as $gasto)
                     <tr>
                         <td>
                             <strong>{{ $gasto->concepto }}</strong>
@@ -87,5 +87,5 @@
         </table>
     </div>
 </div>
-<div class="mt-3">{{ $Gastos->links() }}</div>
+<div class="mt-3">{{ $gastos->links() }}</div>
 @endsection

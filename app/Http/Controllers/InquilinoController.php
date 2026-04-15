@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Inquilino;
 use Illuminate\Http\Request;
+use App\Services\AuditoriaServicio;
 
 class InquilinoController extends Controller
 {
     public function index()
     {
-        $Inquilinos = Inquilino::withCount('Contratos')
+        $Inquilinos = Inquilino::withCount('contratos')
             ->latest()
             ->paginate(10);
 
@@ -39,7 +40,15 @@ class InquilinoController extends Controller
             'observaciones'        => 'nullable|string',
         ]);
 
-        Inquilino::create($validated);
+        $inquilino = Inquilino::create($validated);
+
+        // 🔥 AUDITORÍA CREATE
+        AuditoriaServicio::registrar([
+            'tabla' => 'inquilinos',
+            'accion' => 'CREATE',
+            'registro_id' => $inquilino->id,
+            'datos_nuevos' => $inquilino->toArray()
+        ]);
 
         return redirect()->route('inquilino.index')
             ->with('success', 'Inquilino registrado correctamente.');
@@ -47,7 +56,7 @@ class InquilinoController extends Controller
 
     public function show(Inquilino $inquilino)
     {
-        $inquilino->load(['contrato.unidad.propiedad']);
+        $inquilino->load(['contratos.unidad.propiedad']);
         return view('inquilino.show', compact('inquilino'));
     }
 
@@ -74,7 +83,18 @@ class InquilinoController extends Controller
             'observaciones'        => 'nullable|string',
         ]);
 
+        $antes = $inquilino->toArray();
+
         $inquilino->update($validated);
+
+        // 🔥 AUDITORÍA UPDATE
+        AuditoriaServicio::registrar([
+            'tabla' => 'inquilinos',
+            'accion' => 'UPDATE',
+            'registro_id' => $inquilino->id,
+            'datos_anteriores' => $antes,
+            'datos_nuevos' => $inquilino->toArray()
+        ]);
 
         return redirect()->route('inquilino.show', $inquilino)
             ->with('success', 'Inquilino actualizado correctamente.');
@@ -86,7 +106,18 @@ class InquilinoController extends Controller
             return back()->with('error', 'No se puede eliminar un inquilino con contratos activos.');
         }
 
+        $antes = $inquilino->toArray();
+
         $inquilino->delete();
+
+        // 🔥 AUDITORÍA DELETE
+        AuditoriaServicio::registrar([
+            'tabla' => 'inquilinos',
+            'accion' => 'DELETE',
+            'registro_id' => $inquilino->id,
+            'datos_anteriores' => $antes,
+            'datos_nuevos' => null
+        ]);
 
         return redirect()->route('inquilino.index')
             ->with('success', 'Inquilino eliminado correctamente.');

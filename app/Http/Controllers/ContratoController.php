@@ -6,12 +6,13 @@ use App\Models\Contrato;
 use App\Models\Unidad;
 use App\Models\Inquilino;
 use Illuminate\Http\Request;
+use App\Services\AuditoriaServicio;
 
 class ContratoController extends Controller
 {
     public function index()
     {
-        $Contrato = Contrato::with(['Unidad.Propiedad', 'inquilino'])
+        $Contrato = Contrato::with(['unidad.propiedad', 'inquilino'])
             ->latest()
             ->paginate(10);
 
@@ -22,6 +23,7 @@ class ContratoController extends Controller
     {
         $unidades   = Unidad::disponibles()->with('propiedad')->get();
         $inquilinos = Inquilino::activos()->get();
+
         return view('contrato.create', compact('unidades', 'inquilinos'));
     }
 
@@ -32,7 +34,6 @@ class ContratoController extends Controller
             'inquilino_id'           => 'required|exists:inquilinos,id',
             'fecha_inicio'           => 'required|date',
             'fecha_fin'              => 'required|date|after:fecha_inicio',
-            'monto_mensual'          => 'required|numeric|min:0',
             'deposito'               => 'nullable|numeric|min:0',
             'dia_pago'               => 'required|integer|min:1|max:31',
             'estado'                 => 'required|in:activo,vencido,cancelado,pendiente',
@@ -43,8 +44,11 @@ class ContratoController extends Controller
             'renovacion_automatica'  => 'boolean',
         ]);
 
-        // Verificar que la unidad no tenga contrato activo
-        $tieneContratoActivo = Contrato::where('unidad_id', $validated['unidad_id'])
+        // 🔥 VALIDAR UNIDAD
+        $unidad = Unidad::findOrFail($validated['unidad_id']);
+
+        // 🔥 VALIDAR CONTRATO ACTIVO
+        $tieneContratoActivo = Contrato::where('unidad_id', $unidad->id)
             ->where('estado', 'activo')
             ->exists();
 
@@ -54,9 +58,24 @@ class ContratoController extends Controller
                 ->with('error', 'La unidad ya tiene un contrato activo.');
         }
 
+        // 🔥 TOMAR MONTO DESDE LA UNIDAD
+        $validated['monto_mensual'] = $unidad->precio_renta;
+
+        // 🔥 CODIGO
         $validated['codigo'] = Contrato::generarCodigo();
 
-        Contrato::create($validated);
+        $validated['creado_por_usuario_id'] = auth()->id();
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+
+        $contrato = Contrato::create($validated);
+
+        // 🔥 AUDITORIA
+        AuditoriaServicio::registrar([
+            'tabla' => 'contratos',
+            'accion' => 'CREATE',
+            'registro_id' => $contrato->id,
+            'datos_nuevos' => $contrato->toArray()
+        ]);
 
         return redirect()->route('contrato.index')
             ->with('success', 'Contrato creado correctamente.');
@@ -72,6 +91,7 @@ class ContratoController extends Controller
     {
         $unidades   = Unidad::with('propiedad')->get();
         $inquilinos = Inquilino::activos()->get();
+
         return view('contrato.edit', compact('contrato', 'unidades', 'inquilinos'));
     }
 
@@ -82,7 +102,6 @@ class ContratoController extends Controller
             'inquilino_id'           => 'required|exists:inquilinos,id',
             'fecha_inicio'           => 'required|date',
             'fecha_fin'              => 'required|date|after:fecha_inicio',
-            'monto_mensual'          => 'required|numeric|min:0',
             'deposito'               => 'nullable|numeric|min:0',
             'dia_pago'               => 'required|integer|min:1|max:31',
             'estado'                 => 'required|in:activo,vencido,cancelado,pendiente',
@@ -93,7 +112,24 @@ class ContratoController extends Controller
             'renovacion_automatica'  => 'boolean',
         ]);
 
+        $antes = $contrato->toArray();
+
+        // 🔥 ACTUALIZAR MONTO DESDE UNIDAD SI CAMBIA
+        $unidad = Unidad::findOrFail($validated['unidad_id']);
+        $validated['monto_mensual'] = $unidad->precio_renta;
+
+        $validated['actualizado_por_usuario_id'] = auth()->id();
+
         $contrato->update($validated);
+
+        // 🔥 AUDITORIA
+        AuditoriaServicio::registrar([
+            'tabla' => 'contratos',
+            'accion' => 'UPDATE',
+            'registro_id' => $contrato->id,
+            'datos_anteriores' => $antes,
+            'datos_nuevos' => $contrato->toArray()
+        ]);
 
         return redirect()->route('contrato.show', $contrato)
             ->with('success', 'Contrato actualizado correctamente.');
@@ -102,10 +138,21 @@ class ContratoController extends Controller
     public function destroy(Contrato $contrato)
     {
         if ($contrato->estado === 'activo') {
-            return back()->with('error', 'No se puede eliminar un contrato activo. Cancélelo primero.');
+            return back()->with('error', 'No se puede eliminar un contrato activo.');
         }
 
+        $antes = $contrato->toArray();
+
         $contrato->delete();
+
+        // 🔥 AUDITORIA
+        AuditoriaServicio::registrar([
+            'tabla' => 'contratos',
+            'accion' => 'DELETE',
+            'registro_id' => $contrato->id,
+            'datos_anteriores' => $antes,
+            'datos_nuevos' => null
+        ]);
 
         return redirect()->route('contrato.index')
             ->with('success', 'Contrato eliminado correctamente.');

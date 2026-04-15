@@ -24,9 +24,20 @@
         .badge-cancelado    { background-color: #e74c3c; }
         .badge-pendiente    { background-color: #f39c12; }
         .badge-pagado       { background-color: #27ae60; }
+        /* ❌ Ocultar "Showing..." */
+      /* 🔥 ocultar texto "Showing..." */
+        /* 🔥 ocultar texto "Showing..." */
+/* 🔥 ocultar texto "Showing..." de Laravel */
+
     </style>
     @stack('styles')
 </head>
+
+
+<form id="logout-auto" action="{{ route('logout') }}" method="POST" style="display:none;">
+    @csrf
+</form>
+
 <body>
 <div class="d-flex">
     {{-- Sidebar --}}
@@ -55,7 +66,46 @@
            class="nav-link {{ request()->routeIs('gasto*') ? 'active' : '' }}">
             <i class="bi bi-cash-stack me-2"></i>Gastos
         </a>
+        <a href="{{ route('pagos.index') }}"
+        class="nav-link {{ request()->routeIs('pagos*') ? 'active' : '' }}">
+            <i class="bi bi-cash-coin me-2"></i>Pagos
+        </a>
+        <a href="{{ route('solicitudes.index') }}"
+        class="nav-link {{ request()->routeIs('solicitudes*') ? 'active' : '' }}">
+            <i class="bi bi-cash-coin me-2"></i>Solicitudes
+        </a>
+        <a href="{{ route('tareas.index') }}"
+            class="nav-link {{ request()->routeIs('tareas*') ? 'active' : '' }}">
+                <i class="bi bi-cash-coin me-2"></i>Tareas
+        </a>
+        @auth
+            @if(auth()->user()->esAdmin())
+                <a href="{{ route('usuarios.index') }}"
+                class="nav-link {{ request()->routeIs('usuarios*') ? 'active' : '' }}">
+                    <i class="bi bi-person me-2"></i>Usuarios
+                </a>
+            @endif
+        @endauth
+        @auth
+        @if(auth()->user()->esAdmin())
+            <a href="{{ route('auditoria.index') }}" 
+                class="nav-link {{ request()->routeIs('auditoria*') ? 'active' : '' }}">
+                <i class="bi bi-clock-history me-2"></i>Auditoría
+            </a>
+        @endif
+    @endauth
+    
+        @auth
+    <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button class="btn btn-danger w-100 mt-3">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+        </button>
+    </form>
+@endauth
+
     </div>
+
 
     {{-- Contenido principal --}}
     <div class="main-content flex-grow-1">
@@ -75,7 +125,11 @@
 
         @yield('content')
     </div>
+    
 </div>
+
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')

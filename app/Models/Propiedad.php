@@ -4,18 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Propiedad extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'propiedades';
 
     protected $fillable = [
-        'user_id',
         'nombre',
         'direccion',
         'ciudad',
@@ -33,53 +29,43 @@ class Propiedad extends Model
         'area_total' => 'decimal:2',
     ];
 
-    // ─── Relaciones ────────────────────────────────────────────────────────────
+    // 🔥 RELACIONES CORRECTAS
 
-    public function user(): BelongsTo
+    public function unidades()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(Unidad::class, 'propiedad_id');
     }
 
-    public function Unidades()
-{
-    return $this->hasMany(Unidad::class, 'propiedad_id');
-}
-
-    public function Unidad(): HasMany
+    public function gastos()
     {
-        return $this->hasMany(Unidad::class);
+        return $this->hasMany(Gasto::class, 'propiedad_id');
     }
 
-    public function gasto(): HasMany
-    {
-        return $this->hasMany(Gasto::class);
-    }
-
-    // ─── Scopes ────────────────────────────────────────────────────────────────
+    // 🔥 SCOPES
 
     public function scopeActivas($query)
     {
         return $query->where('activa', true);
     }
 
-    // ─── Accessors ─────────────────────────────────────────────────────────────
+    // 🔥 ACCESSORS
 
-    public function getTotalUnidadesAttribute(): int
+    public function getTotalUnidadesAttribute()
     {
-        return $this->unidad()->count();
+        return $this->unidades()->count();
     }
 
-    public function getUnidadesDisponiblesAttribute(): int
+    public function getUnidadesDisponiblesAttribute()
     {
-        return $this->unidad()->where('estado', 'disponible')->count();
+        return $this->unidades()->where('estado', 'disponible')->count();
     }
 
-    public function getUnidadesOcupadasAttribute(): int
+    public function getUnidadesOcupadasAttribute()
     {
-        return $this->unidad()->where('estado', 'ocupada')->count();
+        return $this->unidades()->where('estado', 'ocupada')->count();
     }
 
-    public function getDireccionCompletaAttribute(): string
+    public function getDireccionCompletaAttribute()
     {
         return "{$this->direccion}, {$this->ciudad}" . ($this->departamento ? ", {$this->departamento}" : '');
     }

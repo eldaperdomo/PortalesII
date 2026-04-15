@@ -12,6 +12,7 @@ class Gasto extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'gastos';
+    
 
     protected $fillable = [
         'propiedad_id',
