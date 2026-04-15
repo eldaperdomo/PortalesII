@@ -5,6 +5,8 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar — {{ $unidad->identificador }}</h4>
     <a href="{{ route('unidad.show', $unidad) }}" class="btn btn-outline-secondary">
+    <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar Unidad — {{ $unidad->nombre }}</h4>
+    <a href="{{ route('unidad.index', $unidad) }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
 </div>
@@ -71,7 +73,7 @@
                 <button type="submit" class="btn btn-warning">
                     <i class="bi bi-save me-1"></i>Actualizar Unidad
                 </button>
-                <a href="{{ route('unidad.show', $unidad) }}" class="btn btn-outline-secondary">Cancelar</a>
+                <a href="{{ route('unidad.index', $unidad) }}" class="btn btn-outline-secondary">Cancelar</a>
             </div>
         </form>
     </div>

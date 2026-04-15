@@ -44,6 +44,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong><i class="bi bi-file-text me-2"></i>Contratos</strong>
+                <strong><i class="bi bi-file-text me-2"></i>Historial de Contratos</strong>
                 <a href="{{ route('contrato.create') }}?inquilino_id={{ $inquilino->id }}"
                    class="btn btn-sm btn-primary">
                     <i class="bi bi-plus me-1"></i>Nuevo Contrato
@@ -80,6 +81,8 @@
                                 </td>
                                 <td>
                                     <a href="{{ route('contrato.show', $contrato) }}" class="btn btn-sm btn-outline-info">
+                                    <a href="{{ route('contrato.show', $contrato) }}"
+                                       class="btn btn-sm btn-outline-info">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>
