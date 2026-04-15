@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('propiedades', function (Blueprint $table) {
             $table->id();
-<<<<<<< HEAD:database/migrations/2026_03_26_212304_create_propiedad_table.php
             $table->string('nombre', 150);
             $table->string('direccion', 255)->nullable();
             $table->enum('tipo', ['casa', 'edificio']);
@@ -20,7 +19,6 @@ return new class extends Migration
             $table->integer('actualizado_por_usuario_id')->nullable();
             $table->dateTime('creado_en')->nullable();
             $table->dateTime('actualizado_en')->nullable();
-=======
 
             $table->string('nombre');
             $table->string('direccion');
@@ -44,7 +42,6 @@ return new class extends Migration
 
             $table->timestamps();
             $table->softDeletes();
->>>>>>> 46a26b139ac95d3675b48ca2d0d1fe625c558f87:database/migrations/2026_04_14_212304_create_propiedad_table.php
         });
     }
 
