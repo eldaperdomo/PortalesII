@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
 class Recibo extends Model
 {
     protected $table = 'recibos';
-    public $timestamps = false;
+
+    const CREATED_AT = 'creado_en';
+    const UPDATED_AT = 'actualizado_en';
 
     protected $fillable = [
         'pago_id',
@@ -27,7 +28,6 @@ class Recibo extends Model
         'creado_en',
         'actualizado_en'
     ];
-
 
     public function pago()
     {

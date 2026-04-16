@@ -17,33 +17,26 @@ class PagoController extends Controller
     }
 
     // 🔥 LISTAR
-    public function index(Request $request)
-    {
-        $query = Pago::with('contrato');
+public function index(Request $request)
+{
+    $estado = $request->estado ?? 'activos';
 
-        // 🔥 solo admin ve inactivos
-        if ($request->incluir_inactivos === 'true') {
-            if (!auth()->user()->esAdmin()) {
-                abort(403);
-            }
-        } else {
-            $query->where('activo', true);
-        }
-
-        // 🔥 filtros
-        if ($request->estado) {
-            $query->where('estado', $request->estado);
-        }
-
-        if ($request->periodo) {
-            $query->where('periodo', $request->periodo);
-        }
-
-        $pagos = $query->latest()->paginate(10)->withQueryString();
-
-        return view('pagos.index', compact('pagos'));
+    if ($estado == 'inactivos') {
+        $contratos = Contrato::onlyTrashed()->get();
+    } else {
+        $contratos = Contrato::all();
     }
 
+    $pagos = [];
+
+    if ($request->contrato_id) {
+        $pagos = Pago::with('contrato')
+            ->where('contrato_id', $request->contrato_id)
+            ->get();
+    }
+
+    return view('pagos.index', compact('pagos', 'contratos'));
+}
     // 🔥 FORM CREAR (SIN RELACIÓN 🔥)
     public function create()
     {

@@ -113,11 +113,7 @@ class ContratoController extends Controller
         ]);
 
         $antes = $contrato->toArray();
-
-        // 🔥 ACTUALIZAR MONTO DESDE UNIDAD SI CAMBIA
-        $unidad = Unidad::findOrFail($validated['unidad_id']);
-        $validated['monto_mensual'] = $unidad->precio_renta;
-
+       
         $validated['actualizado_por_usuario_id'] = auth()->id();
 
         $contrato->update($validated);

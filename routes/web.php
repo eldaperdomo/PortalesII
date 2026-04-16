@@ -15,7 +15,18 @@ use App\Http\Controllers\AbonoPagoController;
 use App\Http\Controllers\SolicitudInquilinoController;
 use App\Http\Controllers\TareaMantenimientoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReciboController;
+use Illuminate\Support\Facades\Mail;
 
+Route::get('/test-correo', function () {
+
+    Mail::raw('Correo de prueba desde Laravel', function ($message) {
+        $message->to('TU_CORREO@gmail.com')
+                ->subject('Prueba Laravel');
+    });
+
+    return "Correo enviado";
+});
 /*
 |--------------------------------------------------------------------------
 | REDIRECCIÓN INICIAL
@@ -106,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
         // activar tarea
         Route::put('/tareas/{tarea}/activar', [TareaMantenimientoController::class, 'activar'])
             ->name('tareas.activar');
+            
     });
 
     /*
@@ -116,5 +128,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/abonos/create/{pago}', [AbonoPagoController::class, 'create'])->name('abonos.create');
     Route::post('/abonos', [AbonoPagoController::class, 'store'])->name('abonos.store');
     Route::get('/abonos/{abono}', [AbonoPagoController::class, 'show'])->name('abonos.show');
+
+    Route::get('/recibos/ver/{pago}', [ReciboController::class, 'verReciboPago'])
+    ->name('recibos.ver');
+    Route::get('/recibos/ver-abono/{abono}', [ReciboController::class, 'verReciboAbono'])
+    ->name('recibos.ver.abono');
 
 });

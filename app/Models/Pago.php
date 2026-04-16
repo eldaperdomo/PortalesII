@@ -30,13 +30,19 @@ class Pago extends Model
     ];
 
     public function contrato()
-    {
-        return $this->belongsTo(Contrato::class);
-    }
+{
+    return $this->belongsTo(Contrato::class)->withTrashed();
+}
 
     public function abonos()
     {
         return $this->hasMany(AbonoPago::class);
+    }
+    public function recibo()
+    {
+        return $this->hasOne(\App\Models\Recibo::class, 'pago_id')
+            ->where('tipo', 'pago_completo')
+            ->where('activo', true);
     }
 
     public function getSaldoAttribute()

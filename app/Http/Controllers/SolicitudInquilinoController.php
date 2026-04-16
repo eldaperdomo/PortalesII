@@ -75,61 +75,66 @@ class SolicitudInquilinoController extends Controller
 
     // 🔥 GUARDAR
     public function store(Request $request)
-    {
-        $request->validate([
-            'inquilino_id' => 'required|exists:inquilinos,id',
-            'unidad_id' => 'required|exists:unidades,id',
-            'tipo' => 'required',
-            'asunto' => 'required|max:150',
-            'descripcion' => 'required'
-        ]);
+{
+    $request->validate([
+        'inquilino_id' => 'required|exists:inquilinos,id',
+        'unidad_id' => 'required|exists:unidades,id',
+        'tipo' => 'required',
+        'asunto' => 'required|max:150',
+        'descripcion' => 'required'
+    ]);
 
-        // 🔥 validar contrato activo
-        $contrato = Contrato::where('inquilino_id', $request->inquilino_id)
-            ->where('unidad_id', $request->unidad_id)
-            ->where('estado', 'activo')
-            ->first();
+    // 🔥 validar contrato activo
+    $contrato = Contrato::where('inquilino_id', $request->inquilino_id)
+        ->where('unidad_id', $request->unidad_id)
+        ->where('estado', 'activo')
+        ->first();
 
-        if (!$contrato) {
-            return back()
-                ->withErrors("El inquilino no tiene contrato activo en esa unidad")
-                ->withInput();
-        }
-
-        // 🔥 archivo
-        $ruta = null;
-        if ($request->hasFile('evidencia')) {
-            $ruta = $request->file('evidencia')->store('solicitudes', 'public');
-        }
-
-        $solicitud = SolicitudInquilino::create([
-            'inquilino_id' => $request->inquilino_id,
-            'unidad_id' => $request->unidad_id,
-            'tipo' => $request->tipo,
-            'asunto' => $request->asunto,
-            'descripcion' => $request->descripcion,
-            'prioridad' => $request->prioridad ?? 'media',
-            'estado' => 'abierta',
-            'evidencia_url' => $ruta,
-            'activo' => true,
-            'creado_por_usuario_id' => auth()->id(),
-            'actualizado_por_usuario_id' => auth()->id(),
-        ]);
-
-        // 🔥 AUDITORÍA
-        AuditoriaLog::create([
-            'usuario_id' => auth()->id(),
-            'tabla' => 'solicitudes_inquilino',
-            'accion' => 'CREATE',
-            'registro_id' => $solicitud->id,
-            'datos_nuevos' => $solicitud->toArray(),
-            'ip' => $request->ip(),
-            'fecha' => now()
-        ]);
-
-        return redirect()->route('solicitudes.index')
-            ->with('success', 'Solicitud creada correctamente');
+    if (!$contrato) {
+        return back()
+            ->withErrors("El inquilino no tiene contrato activo en esa unidad")
+            ->withInput();
     }
+
+    // 🔥 archivo
+    $ruta = null;
+    if ($request->hasFile('evidencia')) {
+        $ruta = $request->file('evidencia')->store('solicitudes', 'public');
+    }
+
+    $solicitud = SolicitudInquilino::create([
+        'inquilino_id' => $request->inquilino_id,
+        'unidad_id' => $request->unidad_id,
+        'tipo' => $request->tipo,
+        'asunto' => $request->asunto,
+        'descripcion' => $request->descripcion,
+        'prioridad' => $request->prioridad ?? 'media',
+        'estado' => 'abierta',
+        'evidencia_url' => $ruta,
+        'activo' => true,
+        'creado_por_usuario_id' => auth()->id(),
+        'actualizado_por_usuario_id' => auth()->id(),
+    ]);
+
+    // 🔥 AUDITORÍA
+    AuditoriaLog::create([
+        'usuario_id' => auth()->id(),
+        'tabla' => 'solicitudes_inquilino',
+        'accion' => 'CREATE',
+        'registro_id' => $solicitud->id,
+        'datos_nuevos' => $solicitud->toArray(),
+        'ip' => $request->ip(),
+        'fecha' => now()
+    ]);
+
+    // 🔥 NOTIFICACIÓN (ANTES DEL RETURN)
+    app(\App\Services\NotificacionesServicio::class)
+        ->notificarSolicitud($solicitud);
+
+    // 🔥 REDIRECCIÓN
+    return redirect()->route('solicitudes.index')
+        ->with('success', 'Solicitud creada correctamente');
+}
 
     // 🔥 VER
     public function show(SolicitudInquilino $solicitude)
