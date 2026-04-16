@@ -11,7 +11,6 @@ use App\Services\AuditoriaServicio;
 
 class GastoController extends Controller
 {
-    // 🔥 LISTAR
     public function index()
     {
         $gastos = Gasto::with(['propiedad', 'unidad'])
@@ -24,7 +23,6 @@ class GastoController extends Controller
         return view('gasto.index', compact('gastos', 'totalPendiente', 'totalMes'));
     }
 
-    // 🔥 CREAR
     public function create()
     {
         $propiedades = Propiedad::activas()->get();
@@ -33,64 +31,63 @@ class GastoController extends Controller
         return view('gasto.create', compact('propiedades', 'unidades'));
     }
 
-    // 🔥 GUARDAR
-public function store(Request $request)
-{
-    // ✅ Validación acorde al formulario
-    $validated = $request->validate([
-        'unidad_id'     => 'required|exists:unidades,id',
-        'fecha'         => 'required|date',
-        'monto'         => 'required|numeric|min:0',
-        'categoria'     => 'required|in:mantenimiento,reparacion,compra,servicio,otro',
-        'descripcion'   => 'nullable|string|max:255',
-        'observaciones' => 'nullable|string',
-        'comprobante'   => 'nullable|string|max:255',
-        'activo'        => 'nullable|boolean',
-    ]);
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'propiedad_id'    => 'required|exists:propiedades,id',
+            'unidad_id'       => 'nullable|exists:unidades,id',
+            'concepto'        => 'required|string|max:255',
+            'monto'           => 'required|numeric|min:0',
+            'fecha'           => 'required|date',
+            'categoria'       => 'required|in:mantenimiento,reparacion,impuesto,seguro,servicios,administracion,limpieza,otro',
+            'estado'          => 'required|in:pendiente,pagado,cancelado',
+            'proveedor'       => 'nullable|string|max:150',
+            'comprobante'     => 'nullable|string|max:100',
+            'archivo_adjunto' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
+            'descripcion'     => 'nullable|string',
+        ]);
 
-    // ✅ Obtener unidad y asignar propiedad automáticamente
-    $unidad = Unidad::findOrFail($validated['unidad_id']);
-    $validated['propiedad_id'] = $unidad->propiedad_id;
+        if ($request->hasFile('archivo_adjunto')) {
+            $validated['archivo_adjunto'] = $request->file('archivo_adjunto')
+                ->store('gastos', 'public');
+        }
 
-    // ✅ Estado por defecto
-    $validated['estado'] = 'pendiente';
+        if (!empty($validated['unidad_id'])) {
+            $unidad = Unidad::findOrFail($validated['unidad_id']);
 
-    // ✅ Manejo de checkbox (activo)
-    $validated['activo'] = $request->has('activo') ? 1 : 0;
+            if ($unidad->propiedad_id != $validated['propiedad_id']) {
+                return back()->withInput()
+                    ->with('error', 'La unidad no pertenece a la propiedad seleccionada.');
+            }
+        }
+        $gasto = Gasto::create(array_merge($validated, [
+            'creado_por_usuario_id' => auth()->id(),
+            'actualizado_por_usuario_id' => auth()->id(),
+            'creado_en' => now(),
+            'actualizado_en' => now(),
+        ]));
 
-    // ✅ Crear gasto
-    $gasto = Gasto::create([
-        ...$validated,
-        'creado_por_usuario_id'      => auth()->id(),
-        'actualizado_por_usuario_id'=> auth()->id(),
-        'creado_en'                 => now(),
-        'actualizado_en'            => now(),
-    ]);
-
-    // ✅ Auditoría
-    AuditoriaServicio::registrar([
-        'usuario_id'       => auth()->id(),
-        'tabla'            => 'gastos',
-        'accion'           => 'CREATE',
-        'registro_id'      => $gasto->id,
-        'datos_anteriores' => null,
-        'datos_nuevos'     => $gasto->toArray(),
-        'ip'               => $request->ip()
-    ]);
+        AuditoriaServicio::registrar([
+            'usuario_id' => auth()->id(),
+            'tabla' => 'gastos',
+            'accion' => 'CREATE',
+            'registro_id' => $gasto->id,
+            'datos_anteriores' => null,
+            'datos_nuevos' => $gasto->toArray(),
+            'ip' => request()->ip()
+        ]);
 
     // ✅ Redirección
     return redirect()->route('gasto.index')
         ->with('success', 'Gasto registrado correctamente.');
 }
 
-    // 🔥 VER
     public function show(Gasto $gasto)
     {
         $gasto->load('unidad.propiedad');
         return view('gasto.show', compact('gasto'));
     }
 
-    // 🔥 EDITAR
     public function edit(Gasto $gasto)
     {
         $propiedades = Propiedad::activas()->get();
@@ -99,7 +96,6 @@ public function store(Request $request)
         return view('gasto.edit', compact('gasto', 'propiedades', 'unidades'));
     }
 
-    // 🔥 ACTUALIZAR
     public function update(Request $request, Gasto $gasto)
     {
         $unidad = Unidad::find($validated['unidad_id']);
@@ -118,7 +114,6 @@ public function store(Request $request)
 
         $antes = $gasto->toArray();
 
-        // 🔥 archivo
         if ($request->hasFile('archivo_adjunto')) {
             if ($gasto->archivo_adjunto) {
                 Storage::disk('public')->delete($gasto->archivo_adjunto);
@@ -133,7 +128,6 @@ public function store(Request $request)
             'actualizado_en' => now(),
         ]));
 
-        // 🔥 auditoría
         AuditoriaServicio::registrar([
             'usuario_id' => auth()->id(),
             'tabla' => 'gastos',
@@ -148,7 +142,6 @@ public function store(Request $request)
             ->with('success', 'Gasto actualizado correctamente.');
     }
 
-    // 🔥 ELIMINAR
     public function destroy(Gasto $gasto)
     {
         $antes = $gasto->toArray();
@@ -159,7 +152,6 @@ public function store(Request $request)
 
         $gasto->delete();
 
-        // 🔥 auditoría
         AuditoriaServicio::registrar([
             'usuario_id' => auth()->id(),
             'tabla' => 'gastos',

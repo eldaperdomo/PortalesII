@@ -11,12 +11,10 @@ use Illuminate\Http\Request;
 class SolicitudInquilinoController extends Controller
 {
 
-    // 🔥 LISTAR
     public function index(Request $request)
     {
         $query = SolicitudInquilino::with(['inquilino', 'unidad']);
 
-        // 🔥 activos / inactivos
         if ($request->incluir_inactivos === 'true') {
 
             if (!auth()->user()->esAdmin()) {
@@ -27,7 +25,6 @@ class SolicitudInquilinoController extends Controller
             $query->where('activo', true);
         }
 
-        // 🔥 filtros
         if ($request->estado) {
             $query->where('estado', $request->estado);
         }
@@ -40,7 +37,6 @@ class SolicitudInquilinoController extends Controller
             $query->where('tipo', $request->tipo);
         }
 
-        // 🔥 🔥 BUSCADOR PRO
         if ($request->search) {
             $search = $request->search;
 
@@ -65,7 +61,7 @@ class SolicitudInquilinoController extends Controller
         return view('solicitudes.index', compact('solicitudes'));
     }
 
-    // 🔥 FORM CREAR
+
     public function create()
     {
         $unidades = Unidad::with(['contratos.inquilino'])->get();
@@ -73,72 +69,70 @@ class SolicitudInquilinoController extends Controller
         return view('solicitudes.create', compact('unidades'));
     }
 
-    // 🔥 GUARDAR
     public function store(Request $request)
-    {
-        $request->validate([
-            'inquilino_id' => 'required|exists:inquilinos,id',
-            'unidad_id' => 'required|exists:unidades,id',
-            'tipo' => 'required',
-            'asunto' => 'required|max:150',
-            'descripcion' => 'required'
-        ]);
+{
+    $request->validate([
+        'inquilino_id' => 'required|exists:inquilinos,id',
+        'unidad_id' => 'required|exists:unidades,id',
+        'tipo' => 'required',
+        'asunto' => 'required|max:150',
+        'descripcion' => 'required'
+    ]);
 
-        // 🔥 validar contrato activo
-        $contrato = Contrato::where('inquilino_id', $request->inquilino_id)
-            ->where('unidad_id', $request->unidad_id)
-            ->where('estado', 'activo')
-            ->first();
+    $contrato = Contrato::where('inquilino_id', $request->inquilino_id)
+        ->where('unidad_id', $request->unidad_id)
+        ->where('estado', 'activo')
+        ->first();
 
-        if (!$contrato) {
-            return back()
-                ->withErrors("El inquilino no tiene contrato activo en esa unidad")
-                ->withInput();
-        }
-
-        // 🔥 archivo
-        $ruta = null;
-        if ($request->hasFile('evidencia')) {
-            $ruta = $request->file('evidencia')->store('solicitudes', 'public');
-        }
-
-        $solicitud = SolicitudInquilino::create([
-            'inquilino_id' => $request->inquilino_id,
-            'unidad_id' => $request->unidad_id,
-            'tipo' => $request->tipo,
-            'asunto' => $request->asunto,
-            'descripcion' => $request->descripcion,
-            'prioridad' => $request->prioridad ?? 'media',
-            'estado' => 'abierta',
-            'evidencia_url' => $ruta,
-            'activo' => true,
-            'creado_por_usuario_id' => auth()->id(),
-            'actualizado_por_usuario_id' => auth()->id(),
-        ]);
-
-        // 🔥 AUDITORÍA
-        AuditoriaLog::create([
-            'usuario_id' => auth()->id(),
-            'tabla' => 'solicitudes_inquilino',
-            'accion' => 'CREATE',
-            'registro_id' => $solicitud->id,
-            'datos_nuevos' => $solicitud->toArray(),
-            'ip' => $request->ip(),
-            'fecha' => now()
-        ]);
-
-        return redirect()->route('solicitudes.index')
-            ->with('success', 'Solicitud creada correctamente');
+    if (!$contrato) {
+        return back()
+            ->withErrors("El inquilino no tiene contrato activo en esa unidad")
+            ->withInput();
     }
 
-    // 🔥 VER
+    $ruta = null;
+    if ($request->hasFile('evidencia')) {
+        $ruta = $request->file('evidencia')->store('solicitudes', 'public');
+    }
+
+    $solicitud = SolicitudInquilino::create([
+        'inquilino_id' => $request->inquilino_id,
+        'unidad_id' => $request->unidad_id,
+        'tipo' => $request->tipo,
+        'asunto' => $request->asunto,
+        'descripcion' => $request->descripcion,
+        'prioridad' => $request->prioridad ?? 'media',
+        'estado' => 'abierta',
+        'evidencia_url' => $ruta,
+        'activo' => true,
+        'creado_por_usuario_id' => auth()->id(),
+        'actualizado_por_usuario_id' => auth()->id(),
+    ]);
+
+    AuditoriaLog::create([
+        'usuario_id' => auth()->id(),
+        'tabla' => 'solicitudes_inquilino',
+        'accion' => 'CREATE',
+        'registro_id' => $solicitud->id,
+        'datos_nuevos' => $solicitud->toArray(),
+        'ip' => $request->ip(),
+        'fecha' => now()
+    ]);
+
+    app(\App\Services\NotificacionesServicio::class)
+        ->notificarSolicitud($solicitud);
+
+    return redirect()->route('solicitudes.index')
+        ->with('success', 'Solicitud creada correctamente');
+}
+
+    
     public function show(SolicitudInquilino $solicitude)
     {
         $solicitude->load(['inquilino', 'unidad']);
         return view('solicitudes.show', compact('solicitude'));
     }
 
-    // 🔥 EDITAR
     public function edit(SolicitudInquilino $solicitude)
     {
         $unidades = Unidad::with(['contratos.inquilino'])->get();
@@ -146,7 +140,6 @@ class SolicitudInquilinoController extends Controller
         return view('solicitudes.edit', compact('solicitude', 'unidades'));
     }
 
-    // 🔥 ACTUALIZAR
     public function update(Request $request, SolicitudInquilino $solicitude)
     {
         $request->validate([
@@ -163,7 +156,7 @@ class SolicitudInquilinoController extends Controller
 
         $antes = $solicitude->toArray();
 
-        // 🔥 archivo
+       
         if ($request->hasFile('evidencia')) {
             $ruta = $request->file('evidencia')->store('solicitudes', 'public');
             $solicitude->evidencia_url = $ruta;
@@ -180,7 +173,7 @@ class SolicitudInquilinoController extends Controller
             'actualizado_por_usuario_id' => auth()->id(),
         ]);
 
-        // 🔥 AUDITORÍA
+        
         AuditoriaLog::create([
             'usuario_id' => auth()->id(),
             'tabla' => 'solicitudes_inquilino',
@@ -196,7 +189,7 @@ class SolicitudInquilinoController extends Controller
             ->with('success', 'Solicitud actualizada');
     }
 
-    // 🔥 DESACTIVAR
+   
     public function destroy(SolicitudInquilino $solicitude)
     {
         $antes = $solicitude->toArray();
@@ -220,7 +213,7 @@ class SolicitudInquilinoController extends Controller
         return back()->with('success', 'Solicitud desactivada');
     }
 
-    // 🔥 ACTIVAR
+  
     public function activar(SolicitudInquilino $solicitude)
     {
         $antes = $solicitude->toArray();

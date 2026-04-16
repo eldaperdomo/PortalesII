@@ -33,4 +33,10 @@ class AbonoPago extends Model
     {
         return $this->belongsTo(Pago::class);
     }
+    public function recibo()
+    {
+        return $this->hasOne(\App\Models\Recibo::class, 'abono_pago_id')
+            ->where('tipo', 'abono')
+            ->where('activo', true);
+    }
 }

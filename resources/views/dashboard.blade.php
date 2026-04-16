@@ -7,7 +7,6 @@
     <h4><i class="bi bi-speedometer2 me-2"></i>Dashboard</h4>
 </div>
 
-{{-- 🔥 MÉTRICAS --}}
 <div class="row g-3">
 
     <div class="col-md-3">
@@ -40,7 +39,6 @@
 
 </div>
 
-{{-- 🔥 SEGUNDA FILA --}}
 <div class="row g-3 mt-2">
 
     <div class="col-md-4">
@@ -66,7 +64,6 @@
 
 </div>
 
-{{-- 🔥 ÚLTIMAS ACTIVIDADES --}}
 <div class="card mt-4">
     <div class="card-header">
         <strong>Últimas solicitudes</strong>

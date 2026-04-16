@@ -124,6 +124,7 @@
                 <div class="mt-4 d-flex gap-2">
                     <button class="btn btn-primary">
                         <i class="bi bi-save"></i> Guardar
+                        
                     </button>
 
                     <a href="{{ route('pagos.show', $pago) }}" class="btn btn-outline-secondary">

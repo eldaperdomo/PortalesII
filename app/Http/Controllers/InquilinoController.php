@@ -34,7 +34,6 @@ class InquilinoController extends Controller
 
         $inquilino = Inquilino::create($validated);
 
-        // 🔥 AUDITORÍA CREATE
         AuditoriaServicio::registrar([
             'accion' => 'CREATE',
             'tabla' => 'inquilinos',
@@ -70,7 +69,6 @@ class InquilinoController extends Controller
 
         $inquilino->update($validated);
 
-        // 🔥 AUDITORÍA UPDATE
         AuditoriaServicio::registrar([
             'tabla' => 'inquilinos',
             'accion' => 'UPDATE',
@@ -93,7 +91,6 @@ class InquilinoController extends Controller
 
         $inquilino->delete();
 
-        // 🔥 AUDITORÍA DELETE
         AuditoriaServicio::registrar([
             'tabla' => 'inquilinos',
             'accion' => 'DELETE',

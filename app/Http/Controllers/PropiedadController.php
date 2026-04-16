@@ -34,7 +34,6 @@ class PropiedadController extends Controller
             'activo'      => 'nullable|boolean',
         ]);
 
-        // 🔥 checkbox activa
         $validated['activa'] = $request->has('activa');
 
         // 🔥 imagen
@@ -44,7 +43,6 @@ class PropiedadController extends Controller
 
         $propiedad = Propiedad::create($validated);
 
-        // 🔥 AUDITORÍA CREATE
         AuditoriaServicio::registrar([
             'tabla' => 'propiedades',
             'accion' => 'CREATE',
@@ -94,7 +92,6 @@ class PropiedadController extends Controller
 
         $propiedad->update($validated);
 
-        // 🔥 AUDITORÍA UPDATE
         AuditoriaServicio::registrar([
             'tabla' => 'propiedades',
             'accion' => 'UPDATE',
@@ -117,7 +114,6 @@ class PropiedadController extends Controller
 
         $propiedad->delete();
 
-        // 🔥 AUDITORÍA DELETE
         AuditoriaServicio::registrar([
             'tabla' => 'propiedades',
             'accion' => 'DELETE',

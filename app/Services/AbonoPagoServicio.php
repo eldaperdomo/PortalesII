@@ -4,6 +4,8 @@ namespace App\Services;
 use App\Models\AbonoPago;
 use App\Models\Pago;
 use App\Models\AuditoriaLog;
+use App\Services\ReciboServicio;
+use App\Services\NotificacionesServicio;
 
 class AbonoPagoServicio
 {
@@ -56,14 +58,13 @@ class AbonoPagoServicio
             $saldo = $pago->monto_esperado - $totalActual;
             throw new \Exception("Excede el saldo. Disponible: L " . number_format($saldo,2));
         }
+
         $ruta = null;
 
         if (request()->hasFile('referencia_pago')) {
             $ruta = request()->file('referencia_pago')->store('abonos', 'public');
         }
 
-        
-        $referenciaFinal = $ruta ?? ($datos['referencia_texto'] ?? null);
         $abono = AbonoPago::create([
             'pago_id' => $pago->id,
             'fecha_abono' => $datos['fecha_abono'] ?? now(),
@@ -77,6 +78,37 @@ class AbonoPagoServicio
         ]);
 
         $this->recalcularPago($pago->id);
+
+      
+        app(ReciboServicio::class)
+            ->crearDesdeAbono([
+                'abono_pago_id' => $abono->id
+            ], $usuarioId);
+
+        // 🔥 cargar relaciones
+        $abono->load('pago.contrato.inquilino');
+
+        // 🔥 obtener recibo
+        $reciboAbono = \App\Models\Recibo::where('abono_pago_id', $abono->id)
+            ->where('tipo', 'abono')
+            ->latest()
+            ->first();
+
+        // 🔥 notificar abono
+        app(NotificacionesServicio::class)
+            ->notificarAbono($abono, $reciboAbono);
+
+       
+        $reciboPago = app(ReciboServicio::class)
+            ->generarAutomatico($pago->id, $usuarioId);
+
+        if ($reciboPago) {
+
+            $pago->load('contrato.inquilino');
+
+            app(NotificacionesServicio::class)
+                ->notificarPagoCompleto($pago, $reciboPago);
+        }
 
         AuditoriaLog::create([
             'usuario_id' => $usuarioId,

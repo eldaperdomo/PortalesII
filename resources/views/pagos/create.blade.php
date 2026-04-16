@@ -6,7 +6,10 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4><i class="bi bi-cash-stack me-2"></i>Nuevo Pago</h4>
 
-    <a href="{{ route('pagos.index') }}" class="btn btn-outline-secondary">
+    <a href="{{ route('pagos.index', [
+        'contrato_id' => request('contrato_id'),
+        'estado' => request('estado', 'activos')
+    ]) }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left"></i> Volver
     </a>
 </div>
@@ -36,7 +39,8 @@
 
                 <select name="contrato_id"
                         class="form-select @error('contrato_id') is-invalid @enderror"
-                        id="contratoSelect">
+                        id="contratoSelect"
+                        {{ request('contrato_id') ? 'disabled' : '' }}>
 
                     <option value="">-- Seleccione --</option>
 
@@ -45,12 +49,18 @@
                                 data-inicio="{{ $c->fecha_inicio }}"
                                 data-periodicidad="{{ $c->periodicidad }}"
                                 data-dia="{{ $c->dia_pago }}"
-                                data-ultimo="{{ $c->ultimo_periodo }}">
+                                data-ultimo="{{ $c->ultimo_periodo }}"
+                                {{ request('contrato_id') == $c->id ? 'selected' : '' }}>
                             {{ $c->codigo }} - {{ ucfirst($c->periodicidad) }}
                         </option>
                     @endforeach
 
                 </select>
+
+                {{-- 🔥 IMPORTANTE --}}
+                @if(request('contrato_id'))
+                    <input type="hidden" name="contrato_id" value="{{ request('contrato_id') }}">
+                @endif
 
                 @error('contrato_id') 
                     <div class="invalid-feedback">{{ $message }}</div> 
@@ -70,7 +80,6 @@
                     <div class="invalid-feedback">{{ $message }}</div> 
                 @enderror
 
-                {{-- INFO --}}
                 <small id="infoPeriodo" class="text-muted d-block mt-1"></small>
             </div>
 
@@ -82,7 +91,10 @@
                 <i class="bi bi-save"></i> Guardar
             </button>
 
-            <a href="{{ route('pagos.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ route('pagos.index', [
+                'contrato_id' => request('contrato_id'),
+                'estado' => request('estado', 'activos')
+            ]) }}" class="btn btn-outline-secondary">
                 Cancelar
             </a>
         </div>
@@ -151,7 +163,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (ultimo) {
             sugerido = sumarMeses(ultimo, f);
         } else {
-            // 🔥 PRIMER PERIODO
             let fechaInicio = new Date(inicioStr);
 
             let year = fechaInicio.getFullYear();
@@ -169,14 +180,17 @@ document.addEventListener('DOMContentLoaded', function () {
             sugerido = year + '-' + String(month).padStart(2, '0');
         }
 
-        // 🔥 AUTOCOMPLETAR
         periodoInput.value = sugerido;
 
-        // 🔥 MENSAJE
         info.innerHTML = `
             <strong>Periodo sugerido:</strong> ${sugerido}
         `;
     });
+
+    // 🔥 AUTO EJECUTAR SI YA VIENE CONTRATO
+    if (contratoSelect.value) {
+        contratoSelect.dispatchEvent(new Event('change'));
+    }
 
 });
 </script>

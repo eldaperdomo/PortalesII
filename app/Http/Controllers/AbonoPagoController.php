@@ -22,25 +22,33 @@ class AbonoPagoController extends Controller
     }
     public function create($pagoId)
     {
-        $pago = \App\Models\Pago::findOrFail($pagoId);
+        $pago = \App\Models\Pago::with('contrato')->findOrFail($pagoId);
 
         return view('abonos.create', compact('pago'));
     }
 
     public function store(Request $request)
-    {
-        try {
-            $this->servicio->crear(
-                $request->all(),
-                auth()->id(),
-                $request->ip()
-            );
+{
+    try {
+        $abono = $this->servicio->crear(
+            $request->all(),
+            auth()->id(),
+            $request->ip()
+        );
 
-            return redirect()->route('pagos.index')
-                ->with('success', 'Abono registrado correctamente');
+       
+        $pago = \App\Models\Pago::findOrFail($abono->pago_id);
 
-        } catch (\Exception $e) {
-            return back()->withErrors($e->getMessage())->withInput();
-        }
+        return redirect()->route('pagos.show', [
+            'pago' => $pago->id,
+            'contrato_id' => $pago->contrato_id,
+            'estado' => request('estado', 'activos')
+        ])->with('success', 'Abono registrado correctamente');
+
+    } catch (\Exception $e) {
+        return redirect()->route('abonos.create', $request->pago_id)
+            ->withErrors($e->getMessage())
+            ->withInput();
     }
+}
 }

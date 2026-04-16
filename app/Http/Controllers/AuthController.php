@@ -8,13 +8,13 @@ use App\Models\Sesion;
 
 class AuthController extends Controller
 {
-    // 📄 Mostrar vista login
+    
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    // 🔐 LOGIN
+   
     public function login(Request $request)
     {
         $request->validate([
@@ -36,20 +36,19 @@ class AuthController extends Controller
 
             $usuario = Auth::user();
 
-            // 🔥 GUARDAR SESIÓN
+           
             Sesion::create([
                 'usuario_id' => $usuario->id,
                 'inicio_sesion' => now(),
                 'user_agent' => $request->header('User-Agent')
             ]);
 
-            // 🔥 VALIDACIÓN EXTRA
             if (!$usuario->activo) {
                 Auth::logout();
                 return back()->withErrors(['login' => 'Usuario inactivo']);
             }
 
-            // 🔥 REDIRECCIÓN
+        
             if ($usuario->esAdmin()) {
                 return redirect()->route('dashboard.admin');
             }
@@ -62,12 +61,11 @@ class AuthController extends Controller
         ])->withInput();
     }
 
-    // 🚪 LOGOUT
     public function logout(Request $request)
     {
         $usuarioId = Auth::id(); // 🔥 guardar antes
 
-        // 🔥 ACTUALIZAR SESIÓN
+    
         $sesion = Sesion::where('usuario_id', $usuarioId)
             ->whereNull('cierre_sesion')
             ->latest()
