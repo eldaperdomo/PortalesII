@@ -42,6 +42,7 @@ class ContratoController extends Controller
             'clausulas_adicionales'  => 'nullable|string',
             'observaciones'          => 'nullable|string',
             'renovacion_automatica'  => 'boolean',
+            'monto_renta'          => 'nullable|numeric|min:0',
         ]);
 
         // 🔥 VALIDAR UNIDAD
@@ -59,7 +60,7 @@ class ContratoController extends Controller
         }
 
         // 🔥 TOMAR MONTO DESDE LA UNIDAD
-        $validated['monto_mensual'] = $unidad->precio_renta;
+        $validated['monto_renta'] = $unidad->monto_renta;
 
         // 🔥 CODIGO
         $validated['codigo'] = Contrato::generarCodigo();
@@ -74,7 +75,8 @@ class ContratoController extends Controller
             'tabla' => 'contratos',
             'accion' => 'CREATE',
             'registro_id' => $contrato->id,
-            'datos_nuevos' => $contrato->toArray()
+            'datos_nuevos' => $contrato->toArray(),
+            'monto_renta' => $unidad->precio_renta
         ]);
 
         return redirect()->route('contrato.index')
@@ -110,13 +112,14 @@ class ContratoController extends Controller
             'clausulas_adicionales'  => 'nullable|string',
             'observaciones'          => 'nullable|string',
             'renovacion_automatica'  => 'boolean',
+            'monto_renta'          => 'nullable|numeric|min:0',
         ]);
 
         $antes = $contrato->toArray();
 
         // 🔥 ACTUALIZAR MONTO DESDE UNIDAD SI CAMBIA
         $unidad = Unidad::findOrFail($validated['unidad_id']);
-        $validated['monto_mensual'] = $unidad->precio_renta;
+        $validated['monto_renta'] = $unidad->monto_renta;
 
         $validated['actualizado_por_usuario_id'] = auth()->id();
 

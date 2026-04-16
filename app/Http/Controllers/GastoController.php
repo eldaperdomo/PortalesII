@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Gasto;
 use App\Models\Unidad;
+use App\Models\Propiedad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Services\AuditoriaServicio;
@@ -33,59 +34,51 @@ class GastoController extends Controller
     }
 
     // 🔥 GUARDAR
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'propiedad_id'    => 'required|exists:propiedades,id',
-            'unidad_id'       => 'nullable|exists:unidades,id',
-            'concepto'        => 'required|string|max:255',
-            'monto'           => 'required|numeric|min:0',
-            'fecha'           => 'required|date',
-            'categoria'       => 'required|in:mantenimiento,reparacion,impuesto,seguro,servicios,administracion,limpieza,otro',
-            'estado'          => 'required|in:pendiente,pagado,cancelado',
-            'proveedor'       => 'nullable|string|max:150',
-            'comprobante'     => 'nullable|string|max:100',
-            'archivo_adjunto' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
-            'descripcion'     => 'nullable|string',
-        ]);
+public function store(Request $request)
+{
+    // ✅ Validación acorde al formulario
+    $validated = $request->validate([
+        'unidad_id'     => 'required|exists:unidades,id',
+        'fecha'         => 'required|date',
+        'monto'         => 'required|numeric|min:0',
+        'categoria'     => 'required|in:mantenimiento,reparacion,compra,servicio,otro',
+        'descripcion'   => 'nullable|string|max:255',
+        'observaciones' => 'nullable|string',
+        'comprobante'   => 'nullable|string|max:255',
+        'activo'        => 'nullable|boolean',
+    ]);
 
-        // 🔥 archivo
-        if ($request->hasFile('archivo_adjunto')) {
-            $validated['archivo_adjunto'] = $request->file('archivo_adjunto')
-                ->store('gastos', 'public');
-        }
+    // ✅ Obtener unidad y asignar propiedad automáticamente
+    $unidad = Unidad::findOrFail($validated['unidad_id']);
+    $validated['propiedad_id'] = $unidad->propiedad_id;
 
-        // 🔥 validar unidad pertenece a propiedad
-        if (!empty($validated['unidad_id'])) {
-            $unidad = Unidad::findOrFail($validated['unidad_id']);
+    // ✅ Estado por defecto
+    $validated['estado'] = 'pendiente';
 
-            if ($unidad->propiedad_id != $validated['propiedad_id']) {
-                return back()->withInput()
-                    ->with('error', 'La unidad no pertenece a la propiedad seleccionada.');
-            }
-        }
+    // ✅ Manejo de checkbox (activo)
+    $validated['activo'] = $request->has('activo') ? 1 : 0;
 
-        // 🔥 crear
-        $gasto = Gasto::create(array_merge($validated, [
-            'creado_por_usuario_id' => auth()->id(),
-            'actualizado_por_usuario_id' => auth()->id(),
-            'creado_en' => now(),
-            'actualizado_en' => now(),
-        ]));
+    // ✅ Crear gasto
+    $gasto = Gasto::create([
+        ...$validated,
+        'creado_por_usuario_id'      => auth()->id(),
+        'actualizado_por_usuario_id'=> auth()->id(),
+        'creado_en'                 => now(),
+        'actualizado_en'            => now(),
+    ]);
 
-        // 🔥 auditoría
-        AuditoriaServicio::registrar([
-            'usuario_id' => auth()->id(),
-            'tabla' => 'gastos',
-            'accion' => 'CREATE',
-            'registro_id' => $gasto->id,
-            'datos_anteriores' => null,
-            'datos_nuevos' => $gasto->toArray(),
-            'ip' => request()->ip()
-        ]);
+    // ✅ Auditoría
+    AuditoriaServicio::registrar([
+        'usuario_id'       => auth()->id(),
+        'tabla'            => 'gastos',
+        'accion'           => 'CREATE',
+        'registro_id'      => $gasto->id,
+        'datos_anteriores' => null,
+        'datos_nuevos'     => $gasto->toArray(),
+        'ip'               => $request->ip()
+    ]);
 
-    Gasto::create($validated);
-
+    // ✅ Redirección
     return redirect()->route('gasto.index')
         ->with('success', 'Gasto registrado correctamente.');
 }

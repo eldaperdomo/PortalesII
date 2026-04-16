@@ -52,7 +52,7 @@
                     <label class="form-label">Tipo *</label>
                     <select name="categoria" class="form-select @error('categoria') is-invalid @enderror" required>
                         <option value="">-- Seleccionar --</option>
-                        @foreach(['mantenimiento','reparacion','compra','servicio','otro'] as $categoria)
+                        @foreach(['mantenimiento','reparacion','impuesto','seguro','servicios','administracion','limpieza','otro'] as $categoria)
                             <option value="{{ $categoria }}" {{ old('categoria') == $categoria ? 'selected' : '' }}>
                                 {{ ucfirst($categoria) }}
                             </option>

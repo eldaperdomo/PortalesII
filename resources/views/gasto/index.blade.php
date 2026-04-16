@@ -9,6 +9,40 @@
     </a>
 </div>
 
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-center">
+
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control"
+                    placeholder="Buscar por descripción..."
+                    value="{{ request('search') }}">
+            </div>
+
+            <div class="col-md-3">
+                <select name="categoria" class="form-select">
+                    <option value="">-- Todas --</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                    <option value="reparacion">Reparación</option>
+                    <option value="compra">Compra</option>
+                    <option value="servicio">Servicio</option>
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button class="btn btn-primary">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+
+                <a href="{{ route('gasto.index') }}" class="btn btn-outline-secondary">
+                    Limpiar
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="card border-0 bg-info bg-opacity-10">

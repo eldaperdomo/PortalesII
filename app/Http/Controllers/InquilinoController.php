@@ -37,6 +37,7 @@ class InquilinoController extends Controller
         // 🔥 AUDITORÍA CREATE
         AuditoriaServicio::registrar([
             'accion' => 'CREATE',
+            'tabla' => 'inquilinos',
             'registro_id' => $inquilino->id,
             'datos_nuevos' => $inquilino->toArray()
         ]);

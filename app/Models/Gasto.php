@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Propiedad;
+use App\Models\Unidad;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Gasto extends Model
@@ -45,6 +47,11 @@ class Gasto extends Model
         return $this->belongsTo(Unidad::class, 'unidad_id');
     }
 
+    public function propiedad(): BelongsTo
+{
+    return $this->belongsTo(Propiedad::class, 'propiedad_id');
+}
+
     // ─── Scopes ────────────────────────────────────────────────────────────────
 
     public function scopeActivos($query)
@@ -58,4 +65,9 @@ class Gasto extends Model
         $anio = $anio ?? now()->year;
         return $query->whereMonth('fecha', $mes)->whereYear('fecha', $anio);
     }
+
+    public function scopePendientes($query)
+{
+    return $query->where('estado', 'pendiente');
+}
 }

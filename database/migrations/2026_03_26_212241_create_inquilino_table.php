@@ -20,8 +20,9 @@ return new class extends Migration
             $table->dateTime('codigo_registro_expira_en')->nullable();
             $table->integer('creado_por_usuario_id')->nullable();
             $table->integer('actualizado_por_usuario_id')->nullable();
-            $table->dateTime('creado_en')->nullable();
-            $table->dateTime('actualizado_en')->nullable();
+            //$table->dateTime('creado_en')->nullable();
+            //$table->dateTime('actualizado_en')->nullable();
+            $table->timestamps();
         });
     }
 

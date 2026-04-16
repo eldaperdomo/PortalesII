@@ -28,6 +28,7 @@ class PropiedadController extends Controller
         $validated = $request->validate([
             'nombre'      => 'required|string|max:150',
             'direccion'   => 'nullable|string|max:255',
+            'ciudad'      => 'required|string|max:255',
             'tipo'        => 'required|in:casa,edificio',
             'descripcion' => 'nullable|string',
             'activo'      => 'nullable|boolean',

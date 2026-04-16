@@ -34,6 +34,12 @@
                 </div>
 
                 <div class="col-12">
+                    <label class="form-label">Ciudad</label>
+                    <input type="text" name="ciudad" maxlength="255" class="form-control"
+                           value="{{ old('ciudad') }}">
+                </div>
+
+                <div class="col-12">
                     <label class="form-label">Dirección</label>
                     <input type="text" name="direccion" maxlength="255" class="form-control"
                            value="{{ old('direccion') }}">

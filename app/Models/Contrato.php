@@ -85,4 +85,13 @@ class Contrato extends Model
     {
         return (int) now()->diffInDays($this->fecha_fin, false);
     }
+
+    public static function generarCodigo()
+{
+    $ultimo = self::orderBy('id', 'desc')->first();
+
+    $numero = $ultimo ? $ultimo->id + 1 : 1;
+
+    return 'CTR-' . str_pad($numero, 5, '0', STR_PAD_LEFT);
+}
 }

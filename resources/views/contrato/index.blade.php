@@ -9,6 +9,39 @@
     </a>
 </div>
 
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-center">
+
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control"
+                    placeholder="Buscar por código o inquilino..."
+                    value="{{ request('search') }}">
+            </div>
+
+            <div class="col-md-3">
+                <select name="estado" class="form-select">
+                    <option value="">-- Todos --</option>
+                    <option value="activo" {{ request('estado')=='activo'?'selected':'' }}>Activo</option>
+                    <option value="vencido" {{ request('estado')=='vencido'?'selected':'' }}>Vencido</option>
+                    <option value="cancelado" {{ request('estado')=='cancelado'?'selected':'' }}>Cancelado</option>
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button class="btn btn-primary">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+
+                <a href="{{ route('contrato.index') }}" class="btn btn-outline-secondary">
+                    Limpiar
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body p-0">
         <table class="table table-hover mb-0 align-middle">
@@ -24,7 +57,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($contratos as $contrato)
+                @forelse($Contrato as $contrato)
                     <tr>
                         <td><strong>{{ $contrato->inquilino->nombre }}</strong></td>
                         <td>
@@ -70,5 +103,5 @@
         </table>
     </div>
 </div>
-<div class="mt-3">{{ $contratos->links() }}</div>
+<div class="mt-3">{{ $Contrato->links() }}</div>
 @endsection

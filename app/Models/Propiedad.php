@@ -17,6 +17,7 @@ class Propiedad extends Model
     protected $fillable = [
         'nombre',
         'direccion',
+        'ciudad',
         'tipo',
         'descripcion',
         'activo',
