@@ -8,7 +8,7 @@ class AuditoriaLog extends Model
 {
     protected $table = 'auditoria_logs';
 
-    public $timestamps = false; // porque usamos 'fecha'
+    public $timestamps = false; 
 
     protected $fillable = [
         'usuario_id',

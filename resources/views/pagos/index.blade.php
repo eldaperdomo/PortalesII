@@ -7,20 +7,6 @@
     <h4 class="mb-0">Pagos</h4>
 </div>
 
-{{-- 🔥 ALERTAS --}}
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show">
-        {{ session('success') }}
-        <button class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
-@if(session('error'))
-    <div class="alert alert-warning alert-dismissible fade show">
-        {{ session('error') }}
-        <button class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
 {{-- 🔥 FILTRO ACTIVO / INACTIVO --}}
 <div class="mb-3">
@@ -152,12 +138,12 @@
                             {{-- VER DETALLE --}}
                             
                             <a href="{{ route('pagos.show', [
-    'pago' => $pago->id,
-    'contrato_id' => request('contrato_id'),
-    'estado' => request('estado')
-]) }}" class="btn btn-sm btn-outline-info">
-    <i class="bi bi-eye"></i>
-</a>
+                                'pago' => $pago->id,
+                                'contrato_id' => request('contrato_id'),
+                                'estado' => request('estado')
+                            ]) }}" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
 
 
                             {{-- RECIBO --}}

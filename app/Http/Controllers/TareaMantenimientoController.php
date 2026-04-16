@@ -11,12 +11,12 @@ use Illuminate\Http\Request;
 class TareaMantenimientoController extends Controller
 {
 
-    // 🔥 LISTAR
+    
     public function index(Request $request)
     {
         $query = TareaMantenimiento::with(['unidad', 'solicitudInquilino']);
 
-        // 🔥 activos / inactivos
+   
         if ($request->incluir_inactivos === 'true') {
 
             if (!auth()->user()->esAdmin()) {
@@ -27,7 +27,7 @@ class TareaMantenimientoController extends Controller
             $query->where('activo', true);
         }
 
-        // 🔥 filtros
+       
         if ($request->estado) {
             $query->where('estado', $request->estado);
         }
@@ -36,7 +36,6 @@ class TareaMantenimientoController extends Controller
             $query->where('prioridad', $request->prioridad);
         }
 
-        // 🔥 buscador PRO
         if ($request->search) {
             $search = $request->search;
 
@@ -59,7 +58,6 @@ class TareaMantenimientoController extends Controller
         return view('tareas.index', compact('tareas'));
     }
 
-    // 🔥 FORM CREAR
     public function create()
     {
         $unidades = Unidad::all();
@@ -68,7 +66,6 @@ class TareaMantenimientoController extends Controller
         return view('tareas.create', compact('unidades', 'solicitudes'));
     }
 
-    // 🔥 GUARDAR
     public function store(Request $request)
     {
         $request->validate([
@@ -76,13 +73,11 @@ class TareaMantenimientoController extends Controller
             'titulo' => 'required|max:150',
         ]);
 
-        // 🔥 validar unidad activa (si tienes activo)
         $unidad = Unidad::find($request->unidad_id);
         if (!$unidad) {
             return back()->withErrors("Unidad no válida")->withInput();
         }
 
-        // 🔥 validar solicitud si viene
         if ($request->solicitud_inquilino_id) {
 
             $solicitud = SolicitudInquilino::find($request->solicitud_inquilino_id);
@@ -96,7 +91,6 @@ class TareaMantenimientoController extends Controller
             }
         }
 
-        // 🔥 lógica estado
         $estado = $request->estado ?? 'pendiente';
         $fechaCompletada = $estado === 'completada' ? now() : null;
 
@@ -114,7 +108,6 @@ class TareaMantenimientoController extends Controller
             'actualizado_por_usuario_id' => auth()->id(),
         ]);
 
-        // 🔥 SI SE COMPLETA → cerrar solicitud
         if ($estado === 'completada' && $tarea->solicitud_inquilino_id) {
 
             $solicitud = SolicitudInquilino::find($tarea->solicitud_inquilino_id);
@@ -142,7 +135,6 @@ class TareaMantenimientoController extends Controller
             }
         }
 
-        // 🔥 auditoría
         AuditoriaLog::create([
             'usuario_id' => auth()->id(),
             'tabla' => 'tareas_mantenimiento',
@@ -157,7 +149,6 @@ class TareaMantenimientoController extends Controller
             ->with('success', 'Tarea creada correctamente');
     }
 
-    // 🔥 VER
     public function show(TareaMantenimiento $tarea)
     {
         $tarea->load(['unidad', 'solicitudInquilino']);
@@ -165,7 +156,7 @@ class TareaMantenimientoController extends Controller
         return view('tareas.show', compact('tarea'));
     }
 
-    // 🔥 EDITAR
+    
     public function edit(TareaMantenimiento $tarea)
     {
         $unidades = Unidad::all();
@@ -174,7 +165,6 @@ class TareaMantenimientoController extends Controller
         return view('tareas.edit', compact('tarea', 'unidades', 'solicitudes'));
     }
 
-    // 🔥 ACTUALIZAR
     public function update(Request $request, TareaMantenimiento $tarea)
     {
         $request->validate([
@@ -198,7 +188,6 @@ class TareaMantenimientoController extends Controller
             'actualizado_por_usuario_id' => auth()->id(),
         ]);
 
-        // 🔥 auditoría
         AuditoriaLog::create([
             'usuario_id' => auth()->id(),
             'tabla' => 'tareas_mantenimiento',
@@ -214,7 +203,6 @@ class TareaMantenimientoController extends Controller
             ->with('success', 'Tarea actualizada');
     }
 
-    // 🔥 DESACTIVAR
     public function destroy(TareaMantenimiento $tarea)
     {
         if (!auth()->user()->esAdmin()) {
@@ -242,7 +230,6 @@ class TareaMantenimientoController extends Controller
         return back()->with('success', 'Tarea desactivada');
     }
 
-    // 🔥 ACTIVAR
     public function activar(TareaMantenimiento $tarea)
     {
         if (!auth()->user()->esAdmin()) {

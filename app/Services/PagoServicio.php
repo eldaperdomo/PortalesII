@@ -28,13 +28,11 @@ class PagoServicio
         };
     }
 
-    // 🔥 VALIDAR PERIODICIDAD REAL
     private function validarPeriodicidad($contrato, $periodo)
     {
         $inicio = Carbon::parse($contrato->fecha_inicio);
         $periodoFecha = Carbon::createFromFormat('Y-m', $periodo);
 
-        // 🔥 ajustar por día de pago
         if ($inicio->day > $contrato->dia_pago) {
             $inicio->addMonth();
         }
@@ -47,7 +45,6 @@ class PagoServicio
         }
     }
 
-    // 🔥 CREAR
     public function crear($datos, $usuarioId, $ip = null)
     {
         if (empty($datos['contrato_id'])) {
@@ -72,27 +69,22 @@ class PagoServicio
         $inicio = Carbon::parse($contrato->fecha_inicio)->startOfMonth();
         $fin = Carbon::parse($contrato->fecha_fin)->endOfMonth();
 
-        // 🔥 NO ANTES
         if ($periodoFecha->lt($inicio)) {
             throw new \Exception("No puedes crear pagos antes del contrato");
         }
 
-        // 🔥 NO DESPUÉS
         if ($periodoFecha->gt($fin)) {
             throw new \Exception("El periodo está fuera del contrato");
         }
 
-        // 🔥 PERIODICIDAD
         $this->validarPeriodicidad($contrato, $datos['periodo']);
 
-        // 🔥 DUPLICADO
         if (Pago::where('contrato_id', $contrato->id)
             ->where('periodo', $datos['periodo'])
             ->exists()) {
             throw new \Exception("Ya existe un pago para ese periodo");
         }
 
-        // 🔥 MONTO SEGÚN PERIODICIDAD
         $monto = $contrato->monto_mensual * $this->factor($contrato->periodicidad);
 
         $pago = Pago::create([
@@ -119,7 +111,6 @@ class PagoServicio
         return $pago;
     }
 
-    // 🔥 ACTUALIZAR
     public function actualizar($pago, $datos, $usuarioId, $ip = null)
     {
         if ($pago->estado === 'pagado') {
@@ -176,7 +167,6 @@ class PagoServicio
         return $pago;
     }
 
-    // 🔥 ELIMINAR
     public function eliminar($pago, $usuarioId, $ip = null)
     {
         if (!$pago->activo) {
@@ -202,7 +192,6 @@ class PagoServicio
         ]);
     }
 
-    // 🔥 ACTIVAR
     public function activar($pago, $usuarioId, $ip = null)
     {
         if ($pago->activo) {

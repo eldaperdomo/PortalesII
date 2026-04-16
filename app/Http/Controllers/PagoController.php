@@ -16,7 +16,6 @@ class PagoController extends Controller
         $this->servicio = $servicio;
     }
 
-    // 🔥 LISTAR
 public function index(Request $request)
 {
     $estado = $request->estado ?? 'activos';
@@ -37,12 +36,10 @@ public function index(Request $request)
 
     return view('pagos.index', compact('pagos', 'contratos'));
 }
-    // 🔥 FORM CREAR (SIN RELACIÓN 🔥)
     public function create()
     {
         $contratos = Contrato::activos()->get();
 
-        // 🔥 calcular último periodo manualmente
         foreach ($contratos as $c) {
             $ultimoPago = Pago::where('contrato_id', $c->id)
                 ->orderBy('periodo', 'desc')
@@ -54,7 +51,6 @@ public function index(Request $request)
         return view('pagos.create', compact('contratos'));
     }
 
-    // 🔥 GUARDAR
     public function store(Request $request)
     {
         $request->validate([
@@ -79,14 +75,12 @@ public function index(Request $request)
         }
     }
 
-    // 🔥 VER
     public function show(Pago $pago)
     {
         $pago->load(['contrato', 'abonos']);
         return view('pagos.show', compact('pago'));
     }
 
-    // 🔥 EDITAR
     public function edit(Pago $pago)
     {
         if ($pago->estado === 'pagado') {
@@ -99,7 +93,6 @@ public function index(Request $request)
         return view('pagos.edit', compact('pago'));
     }
 
-    // 🔥 ACTUALIZAR
     public function update(Request $request, Pago $pago)
     {
         $request->validate([
@@ -123,8 +116,6 @@ public function index(Request $request)
                 ->withInput();
         }
     }
-
-    // 🔥 DESACTIVAR
     public function destroy(Pago $pago)
     {
         if (!auth()->user()->esAdmin()) {
@@ -145,7 +136,6 @@ public function index(Request $request)
         }
     }
 
-    // 🔥 ACTIVAR
     public function activar(Pago $pago)
     {
         if (!auth()->user()->esAdmin()) {

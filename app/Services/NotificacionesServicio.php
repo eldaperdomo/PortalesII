@@ -8,19 +8,15 @@ use Illuminate\Support\Facades\Mail;
 
 class NotificacionesServicio
 {
-    /**
-     * 🔥 NOTIFICAR ABONO (CON PDF)
-     */
+    
    public function notificarAbono($abono, $recibo = null)
 {
     $inquilino = $abono->pago->contrato->inquilino;
 
     if (!$inquilino) return;
 
-    // 🔥 DEFINIR MENSAJE PRIMERO
     $mensaje = "Se registró tu abono de L. " . number_format($abono->monto, 2);
 
-    // 🔥 CREAR SOLO UNA VEZ
     $notificacion = Notificacion::create([
         'inquilino_id' => $inquilino->id,
         'tipo' => 'abono',
@@ -30,7 +26,6 @@ class NotificacionesServicio
         'destino_correo' => $inquilino->email,
     ]);
 
-    // 🔥 SI NO HAY EMAIL, SOLO GUARDA Y YA
     if (!$inquilino->email) return;
 
     try {
@@ -54,9 +49,7 @@ class NotificacionesServicio
         ]);
     }
 }
-    /**
-     * 🔥 NOTIFICAR PAGO COMPLETO
-     */
+    
     public function notificarPagoCompleto($pago, $recibo = null)
     {
         $inquilino = $pago->contrato->inquilino;
@@ -96,14 +89,10 @@ class NotificacionesServicio
         }
     }
 
-    /**
-     * 🔥 NOTIFICAR SOLICITUD
-     */
     public function notificarSolicitud($solicitud)
     {
         $inquilino = $solicitud->inquilino;
 
-        // 🔥 INQUILINO
         if ($inquilino && $inquilino->email) {
 
             Notificacion::create([
@@ -121,7 +110,6 @@ class NotificacionesServicio
             });
         }
 
-        // 🔥 ADMIN
         $admins = \App\Models\Usuario::where('rol', 'admin')->where('activo', true)->get();
 
         foreach ($admins as $admin) {

@@ -5,12 +5,12 @@ use Illuminate\Http\Request;
 class AuditoriaController extends Controller
 {
 
-     // 📄 Listar logs de auditoría
+   
     public function index(Request $request)
     {
         $query = \App\Models\AuditoriaLog::with('usuario');
 
-        // 🔍 BUSCADOR GENERAL
+    
         if ($request->search) {
             $search = $request->search;
 
@@ -21,7 +21,7 @@ class AuditoriaController extends Controller
                 ->orWhere('registro_id', 'like', "%$search%")
                 ->orWhere('ip', 'like', "%$search%")
 
-                // 🔥 buscar por nombre de usuario
+               
                 ->orWhereHas('usuario', function ($sub) use ($search) {
                     $sub->where('nombre', 'like', "%$search%");
                 });

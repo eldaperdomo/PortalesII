@@ -11,7 +11,6 @@ class SesionController extends Controller
     {
         $query = Sesion::with('usuario');
 
-        // 🔍 búsqueda
         if ($request->search) {
             $search = $request->search;
 

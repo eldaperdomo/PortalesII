@@ -11,12 +11,10 @@ use Illuminate\Http\Request;
 class SolicitudInquilinoController extends Controller
 {
 
-    // 🔥 LISTAR
     public function index(Request $request)
     {
         $query = SolicitudInquilino::with(['inquilino', 'unidad']);
 
-        // 🔥 activos / inactivos
         if ($request->incluir_inactivos === 'true') {
 
             if (!auth()->user()->esAdmin()) {
@@ -27,7 +25,6 @@ class SolicitudInquilinoController extends Controller
             $query->where('activo', true);
         }
 
-        // 🔥 filtros
         if ($request->estado) {
             $query->where('estado', $request->estado);
         }
@@ -40,7 +37,6 @@ class SolicitudInquilinoController extends Controller
             $query->where('tipo', $request->tipo);
         }
 
-        // 🔥 🔥 BUSCADOR PRO
         if ($request->search) {
             $search = $request->search;
 
@@ -65,7 +61,7 @@ class SolicitudInquilinoController extends Controller
         return view('solicitudes.index', compact('solicitudes'));
     }
 
-    // 🔥 FORM CREAR
+
     public function create()
     {
         $unidades = Unidad::with(['contratos.inquilino'])->get();
@@ -73,7 +69,6 @@ class SolicitudInquilinoController extends Controller
         return view('solicitudes.create', compact('unidades'));
     }
 
-    // 🔥 GUARDAR
     public function store(Request $request)
 {
     $request->validate([
@@ -84,7 +79,6 @@ class SolicitudInquilinoController extends Controller
         'descripcion' => 'required'
     ]);
 
-    // 🔥 validar contrato activo
     $contrato = Contrato::where('inquilino_id', $request->inquilino_id)
         ->where('unidad_id', $request->unidad_id)
         ->where('estado', 'activo')
@@ -96,7 +90,6 @@ class SolicitudInquilinoController extends Controller
             ->withInput();
     }
 
-    // 🔥 archivo
     $ruta = null;
     if ($request->hasFile('evidencia')) {
         $ruta = $request->file('evidencia')->store('solicitudes', 'public');
@@ -116,7 +109,6 @@ class SolicitudInquilinoController extends Controller
         'actualizado_por_usuario_id' => auth()->id(),
     ]);
 
-    // 🔥 AUDITORÍA
     AuditoriaLog::create([
         'usuario_id' => auth()->id(),
         'tabla' => 'solicitudes_inquilino',
@@ -127,23 +119,20 @@ class SolicitudInquilinoController extends Controller
         'fecha' => now()
     ]);
 
-    // 🔥 NOTIFICACIÓN (ANTES DEL RETURN)
     app(\App\Services\NotificacionesServicio::class)
         ->notificarSolicitud($solicitud);
 
-    // 🔥 REDIRECCIÓN
     return redirect()->route('solicitudes.index')
         ->with('success', 'Solicitud creada correctamente');
 }
 
-    // 🔥 VER
+    
     public function show(SolicitudInquilino $solicitude)
     {
         $solicitude->load(['inquilino', 'unidad']);
         return view('solicitudes.show', compact('solicitude'));
     }
 
-    // 🔥 EDITAR
     public function edit(SolicitudInquilino $solicitude)
     {
         $unidades = Unidad::with(['contratos.inquilino'])->get();
@@ -151,7 +140,6 @@ class SolicitudInquilinoController extends Controller
         return view('solicitudes.edit', compact('solicitude', 'unidades'));
     }
 
-    // 🔥 ACTUALIZAR
     public function update(Request $request, SolicitudInquilino $solicitude)
     {
         $request->validate([
@@ -168,7 +156,7 @@ class SolicitudInquilinoController extends Controller
 
         $antes = $solicitude->toArray();
 
-        // 🔥 archivo
+       
         if ($request->hasFile('evidencia')) {
             $ruta = $request->file('evidencia')->store('solicitudes', 'public');
             $solicitude->evidencia_url = $ruta;
@@ -185,7 +173,7 @@ class SolicitudInquilinoController extends Controller
             'actualizado_por_usuario_id' => auth()->id(),
         ]);
 
-        // 🔥 AUDITORÍA
+        
         AuditoriaLog::create([
             'usuario_id' => auth()->id(),
             'tabla' => 'solicitudes_inquilino',
@@ -201,7 +189,7 @@ class SolicitudInquilinoController extends Controller
             ->with('success', 'Solicitud actualizada');
     }
 
-    // 🔥 DESACTIVAR
+   
     public function destroy(SolicitudInquilino $solicitude)
     {
         $antes = $solicitude->toArray();
@@ -225,7 +213,7 @@ class SolicitudInquilinoController extends Controller
         return back()->with('success', 'Solicitud desactivada');
     }
 
-    // 🔥 ACTIVAR
+  
     public function activar(SolicitudInquilino $solicitude)
     {
         $antes = $solicitude->toArray();

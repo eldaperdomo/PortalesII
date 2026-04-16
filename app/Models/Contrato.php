@@ -43,7 +43,6 @@ class Contrato extends Model
 
     protected static function booted(): void
     {
-        // Al crear un contrato activo, marcar la unidad como ocupada
         static::created(function (Contrato $contrato) {
             if ($contrato->estado === 'activo') {
                 $contrato->unidad->update(['estado' => 'ocupada']);

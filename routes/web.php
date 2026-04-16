@@ -106,15 +106,14 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('solicitudes', SolicitudInquilinoController::class);
         Route::resource('tareas', TareaMantenimientoController::class);
 
-        // activar solicitud
+      
         Route::put('/solicitudes/{solicitude}/activar', [SolicitudInquilinoController::class, 'activar'])
             ->name('solicitudes.activar');
 
-        // activar pago
+  
         Route::put('/pagos/{pago}/activar', [PagoController::class, 'activar'])
             ->name('pagos.activar');
 
-        // activar tarea
         Route::put('/tareas/{tarea}/activar', [TareaMantenimientoController::class, 'activar'])
             ->name('tareas.activar');
             

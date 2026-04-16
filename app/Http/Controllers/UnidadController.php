@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Unidad;
 use App\Models\Propiedad;
 use Illuminate\Http\Request;
-use App\Services\AuditoriaServicio; // 🔥 ajusta si tu servicio está en otro namespace
+use App\Services\AuditoriaServicio; 
 
 class UnidadController extends Controller
 {
@@ -43,7 +43,6 @@ class UnidadController extends Controller
 
         $unidad = Unidad::create($validated);
 
-        // 🔥 AUDITORÍA
         app(AuditoriaServicio::class)->registrar([
             'usuario_id' => auth()->id(),
             'tabla' => 'unidades',
@@ -61,7 +60,7 @@ class UnidadController extends Controller
     public function show(Unidad $unidad)
     {
         $unidad->load(['propiedad', 'contratos.inquilino', 'gastos']);
-        $propiedades = Propiedad::activas()->get(); // 👈 agregar
+        $propiedades = Propiedad::activas()->get(); 
 
         return view('unidad.show', compact('unidad', 'propiedades'));
     }
@@ -94,7 +93,6 @@ class UnidadController extends Controller
 
         $unidad->update($validated);
 
-        // 🔥 AUDITORÍA
         app(AuditoriaServicio::class)->registrar([
             'usuario_id' => auth()->id(),
             'tabla' => 'unidades',
@@ -119,7 +117,7 @@ class UnidadController extends Controller
 
         $unidad->delete();
 
-        // 🔥 AUDITORÍA
+    
         app(AuditoriaServicio::class)->registrar([
             'usuario_id' => auth()->id(),
             'tabla' => 'unidades',

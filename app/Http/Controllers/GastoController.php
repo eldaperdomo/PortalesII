@@ -11,7 +11,6 @@ use App\Services\AuditoriaServicio;
 
 class GastoController extends Controller
 {
-    // 🔥 LISTAR
     public function index()
     {
         $gastos = Gasto::with(['propiedad', 'unidad'])
@@ -24,7 +23,6 @@ class GastoController extends Controller
         return view('gasto.index', compact('gastos', 'totalPendiente', 'totalMes'));
     }
 
-    // 🔥 CREAR
     public function create()
     {
         $propiedades = Propiedad::activas()->get();
@@ -33,7 +31,6 @@ class GastoController extends Controller
         return view('gasto.create', compact('propiedades', 'unidades'));
     }
 
-    // 🔥 GUARDAR
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -50,13 +47,11 @@ class GastoController extends Controller
             'descripcion'     => 'nullable|string',
         ]);
 
-        // 🔥 archivo
         if ($request->hasFile('archivo_adjunto')) {
             $validated['archivo_adjunto'] = $request->file('archivo_adjunto')
                 ->store('gastos', 'public');
         }
 
-        // 🔥 validar unidad pertenece a propiedad
         if (!empty($validated['unidad_id'])) {
             $unidad = Unidad::findOrFail($validated['unidad_id']);
 
@@ -65,8 +60,6 @@ class GastoController extends Controller
                     ->with('error', 'La unidad no pertenece a la propiedad seleccionada.');
             }
         }
-
-        // 🔥 crear
         $gasto = Gasto::create(array_merge($validated, [
             'creado_por_usuario_id' => auth()->id(),
             'actualizado_por_usuario_id' => auth()->id(),
@@ -74,7 +67,6 @@ class GastoController extends Controller
             'actualizado_en' => now(),
         ]));
 
-        // 🔥 auditoría
         AuditoriaServicio::registrar([
             'usuario_id' => auth()->id(),
             'tabla' => 'gastos',
@@ -89,14 +81,12 @@ class GastoController extends Controller
             ->with('success', 'Gasto registrado correctamente.');
     }
 
-    // 🔥 VER
     public function show(Gasto $gasto)
     {
         $gasto->load(['propiedad', 'unidad']);
         return view('gasto.show', compact('gasto'));
     }
 
-    // 🔥 EDITAR
     public function edit(Gasto $gasto)
     {
         $propiedades = Propiedad::activas()->get();
@@ -105,7 +95,6 @@ class GastoController extends Controller
         return view('gasto.edit', compact('gasto', 'propiedades', 'unidades'));
     }
 
-    // 🔥 ACTUALIZAR
     public function update(Request $request, Gasto $gasto)
     {
         $validated = $request->validate([
@@ -124,7 +113,6 @@ class GastoController extends Controller
 
         $antes = $gasto->toArray();
 
-        // 🔥 archivo
         if ($request->hasFile('archivo_adjunto')) {
             if ($gasto->archivo_adjunto) {
                 Storage::disk('public')->delete($gasto->archivo_adjunto);
@@ -139,7 +127,6 @@ class GastoController extends Controller
             'actualizado_en' => now(),
         ]));
 
-        // 🔥 auditoría
         AuditoriaServicio::registrar([
             'usuario_id' => auth()->id(),
             'tabla' => 'gastos',
@@ -154,7 +141,6 @@ class GastoController extends Controller
             ->with('success', 'Gasto actualizado correctamente.');
     }
 
-    // 🔥 ELIMINAR
     public function destroy(Gasto $gasto)
     {
         $antes = $gasto->toArray();
@@ -165,7 +151,6 @@ class GastoController extends Controller
 
         $gasto->delete();
 
-        // 🔥 auditoría
         AuditoriaServicio::registrar([
             'usuario_id' => auth()->id(),
             'tabla' => 'gastos',

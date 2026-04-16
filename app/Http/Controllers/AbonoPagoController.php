@@ -36,7 +36,7 @@ class AbonoPagoController extends Controller
             $request->ip()
         );
 
-        // 🔥 OBTENER EL PAGO CORRECTO
+       
         $pago = \App\Models\Pago::findOrFail($abono->pago_id);
 
         return redirect()->route('pagos.show', [

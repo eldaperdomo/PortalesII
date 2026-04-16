@@ -9,22 +9,18 @@ use App\Services\AuditoriaServicio;
 class UsuarioController extends Controller
 {
 
-    // 👉 LISTAR
     public function index(Request $request)
     {
         $query = Usuario::query();
 
-        // 🔥 Solo activos por defecto
         if ($request->incluir_inactivos !== 'true') {
             $query->where('activo', true);
         }
 
-        // Filtro por rol
         if ($request->rol) {
             $query->where('rol', $request->rol);
         }
 
-        // Búsqueda
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->where('nombre', 'like', "%{$request->search}%")
@@ -38,13 +34,11 @@ class UsuarioController extends Controller
         return view('usuarios.index', compact('usuarios'));
     }
 
-    // 👉 FORM CREAR
     public function create()
     {
         return view('usuarios.create');
     }
 
-    // 👉 GUARDAR
     public function store(Request $request)
     {
         $request->validate([
@@ -83,21 +77,18 @@ class UsuarioController extends Controller
             ->with('success', 'Usuario creado correctamente');
     }
 
-    // 👉 VER
     public function show($id)
     {
         $usuario = Usuario::findOrFail($id);
         return view('usuarios.show', compact('usuario'));
     }
 
-    // 👉 FORM EDITAR
     public function edit($id)
     {
         $usuario = Usuario::findOrFail($id);
         return view('usuarios.edit', compact('usuario'));
     }
 
-    // 👉 ACTUALIZAR
     public function update(Request $request, $id)
     {
         $usuario = Usuario::findOrFail($id);
@@ -112,7 +103,6 @@ class UsuarioController extends Controller
 
         $antes = $usuario->toArray();
 
-        // Imagen
         if ($request->hasFile('foto')) {
 
             if ($usuario->foto_perfil_url && \Storage::disk('public')->exists($usuario->foto_perfil_url)) {
@@ -141,7 +131,6 @@ class UsuarioController extends Controller
         return back()->with('success', 'Usuario actualizado correctamente');
     }
 
-    // 👉 DESACTIVAR (DELETE lógico)
     public function destroy($id)
     {
         $usuario = Usuario::findOrFail($id);
@@ -172,7 +161,6 @@ class UsuarioController extends Controller
         return back()->with('success', 'Usuario desactivado correctamente');
     }
 
-    // 👉 ACTIVAR (UPDATE)
     public function activar($id)
     {
         $usuario = Usuario::findOrFail($id);
@@ -187,7 +175,7 @@ class UsuarioController extends Controller
 
         AuditoriaServicio::registrar([
             'tabla' => 'usuarios',
-            'accion' => 'UPDATE', // 🔥 AQUÍ
+            'accion' => 'UPDATE', 
             'registro_id' => $usuario->id,
             'datos_anteriores' => $antes,
             'datos_nuevos' => $usuario->toArray()

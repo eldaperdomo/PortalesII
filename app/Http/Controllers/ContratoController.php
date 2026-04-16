@@ -44,10 +44,8 @@ class ContratoController extends Controller
             'renovacion_automatica'  => 'boolean',
         ]);
 
-        // 🔥 VALIDAR UNIDAD
         $unidad = Unidad::findOrFail($validated['unidad_id']);
 
-        // 🔥 VALIDAR CONTRATO ACTIVO
         $tieneContratoActivo = Contrato::where('unidad_id', $unidad->id)
             ->where('estado', 'activo')
             ->exists();
@@ -58,10 +56,8 @@ class ContratoController extends Controller
                 ->with('error', 'La unidad ya tiene un contrato activo.');
         }
 
-        // 🔥 TOMAR MONTO DESDE LA UNIDAD
         $validated['monto_mensual'] = $unidad->precio_renta;
 
-        // 🔥 CODIGO
         $validated['codigo'] = Contrato::generarCodigo();
 
         $validated['creado_por_usuario_id'] = auth()->id();
@@ -69,7 +65,6 @@ class ContratoController extends Controller
 
         $contrato = Contrato::create($validated);
 
-        // 🔥 AUDITORIA
         AuditoriaServicio::registrar([
             'tabla' => 'contratos',
             'accion' => 'CREATE',
@@ -118,7 +113,6 @@ class ContratoController extends Controller
 
         $contrato->update($validated);
 
-        // 🔥 AUDITORIA
         AuditoriaServicio::registrar([
             'tabla' => 'contratos',
             'accion' => 'UPDATE',
@@ -141,7 +135,6 @@ class ContratoController extends Controller
 
         $contrato->delete();
 
-        // 🔥 AUDITORIA
         AuditoriaServicio::registrar([
             'tabla' => 'contratos',
             'accion' => 'DELETE',

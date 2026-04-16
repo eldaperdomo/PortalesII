@@ -79,9 +79,7 @@ class AbonoPagoServicio
 
         $this->recalcularPago($pago->id);
 
-        // =============================
-        // 🔥 RECIBO DEL ABONO
-        // =============================
+      
         app(ReciboServicio::class)
             ->crearDesdeAbono([
                 'abono_pago_id' => $abono->id
@@ -100,9 +98,7 @@ class AbonoPagoServicio
         app(NotificacionesServicio::class)
             ->notificarAbono($abono, $reciboAbono);
 
-        // =============================
-        // 🔥 RECIBO DE PAGO COMPLETO
-        // =============================
+       
         $reciboPago = app(ReciboServicio::class)
             ->generarAutomatico($pago->id, $usuarioId);
 

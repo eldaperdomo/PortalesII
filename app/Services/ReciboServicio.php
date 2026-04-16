@@ -19,7 +19,6 @@ class ReciboServicio
         return "REC-{$hoy}-{$correlativo}";
     }
 
-    // 🔥 CREAR DESDE PAGO COMPLETO
     public function crearDesdePago($datos, $usuarioId)
     {
         $pago = Pago::with(['contrato.unidad', 'contrato.inquilino'])
@@ -66,7 +65,6 @@ class ReciboServicio
         return $recibo->load('pago');
     }
 
-    // 🔥 CREAR DESDE ABONO
     public function crearDesdeAbono($datos, $usuarioId)
     {
         if (empty($datos['abono_pago_id'])) {
@@ -107,7 +105,6 @@ class ReciboServicio
         return $recibo->load(['pago', 'abonoPago']);
     }
 
-    // 🔥 GENERAR PDF (reutilizable)
     private function generarPdf($recibo, $pago, $abono = null)
     {
         $pdf = Pdf::loadView('recibos.pdf', [
@@ -126,7 +123,6 @@ class ReciboServicio
         ]);
     }
 
-    // 🔥 AUTOMÁTICO (cuando pago pasa a pagado)
     public function generarAutomatico($pagoId, $usuarioId = null)
     {
         $pago = Pago::with(['contrato.unidad', 'contrato.inquilino'])
